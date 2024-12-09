@@ -1,7 +1,7 @@
-#include "Connect4_Board.h"
+#include "Connect4.h"
 #include "Pyramid_X_O.h"
 #include "Numerical_Tic_Tac_Toe.h"
-//#include "SUS_X_O.h"
+#include "SUS_X_O.h"
 #include <iostream>
 using namespace std;
 
