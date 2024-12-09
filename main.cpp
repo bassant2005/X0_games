@@ -1,6 +1,7 @@
-#include "Connect4.h"
+#include "Connect4_Board.h"
 #include "Pyramid_X_O.h"
-#include "SUS_X_O.h"
+#include "Numerical_Tic_Tac_Toe.h"
+//#include "SUS_X_O.h"
 #include <iostream>
 using namespace std;
 
@@ -18,6 +19,7 @@ void GameManager<T>::run() {
     bool play = true;
 
     while(play){
+        cout << endl;
         cout << "Welcome to the Game Collection!" << endl;
         cout << "Choose a game:" << endl;
         cout << "1. Pyramid Tic-Tac-Toe" << endl;
@@ -47,8 +49,7 @@ void GameManager<T>::run() {
             // wordsTicTacToe.playGame();
         }
         else if (gameChoice == 5){
-            //NumericalTicTacToe numericalTicTacToe;
-            //numericalTicTacToe.playGame();
+            play_numerical_tic_tac_toe();
         }
         else if (gameChoice == 6){
             //MisereTicTacToe misereTicTacToe;
@@ -70,6 +71,7 @@ void GameManager<T>::run() {
         }
     }
 }
+
 
 int main() {
     GameManager<char> game;
