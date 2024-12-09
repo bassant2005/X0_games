@@ -4,36 +4,28 @@
 #include "BoardGame_Classes.h"
 #include <vector>
 #include <iostream>
-#include <limits>
-#include <algorithm>
 #include <set>
 
 using namespace std;
 
-class Numerical_Tic_Tac_Toe : public Board<int>{
-private:
-    set<int> usedNumbers;
-    int lastRow;    // Stores the row of the last attempted move
-    int lastCol;    // Stores the column of the last attempted move
-    int lastNum;    // Stores the number of the last attempted move
-    bool isPlayer1; // Indicates if the current player is Player 1
+set<int> usedNumbers;
 
+class NumericalTicTacToe_Board : public Board<int> {
 public:
-    Numerical_Tic_Tac_Toe(): Board<int>(3,3){
+    NumericalTicTacToe_Board(int i, int i1) : Board<int>(i, i1) {
         initializeBoard();
-        currentPlayerSymbol = '1';
         usedNumbers.clear();
-        srand(time(0));
     }
+
     void initializeBoard() override {
-        for (int i = 0; i < 6; i++) {
-            for (int j = 0; j < 7; j++) {
-                this->board[i][j] = 0;
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                this->board[i][j] = 0; // 0 represents an empty cell
             }
         }
     }
 
-    void display_board() override{
+    void display_board() override {
         cout << "\n";
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
@@ -50,104 +42,453 @@ public:
         cout << "\n";
     }
 
+    bool is_win(int) override {
+        // Check rows
+        for (int i = 0; i < 3; i++) {
+            if (board[i][0] + board[i][1] + board[i][2] == 15 &&
+                board[i][0] != 0 && board[i][1] != 0 && board[i][2] != 0) {
+                return true;
+            }
+        }
+
+        // Check columns
+        for (int i = 0; i < 3; i++) {
+            if (board[0][i] + board[1][i] + board[2][i] == 15 &&
+                board[0][i] != 0 && board[1][i] != 0 && board[2][i] != 0) {
+                return true;
+            }
+        }
+
+        // Check diagonals
+        if (board[0][0] + board[1][1] + board[2][2] == 15 &&
+            board[0][0] != 0 && board[1][1] != 0 && board[2][2] != 0) {
+            return true;
+        }
+        if (board[0][2] + board[1][1] + board[2][0] == 15 &&
+            board[0][2] != 0 && board[1][1] != 0 && board[2][0] != 0) {
+            return true;
+        }
+
+        return false;
+    }
+
+    bool is_draw() override {
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                if (this->board[i][j] == 0) return false;  // There's an empty spot
+            }
+        }
+        return true;  // No empty spots, must be a draw
+    }
+
     bool is_valid_move(int move) override {
-        PositionToRowCol(move);
-        if (lastRow < 0 || lastRow >= 3 || lastCol < 0 || lastCol >= 3) {
-            return false; // Invalid row or column
-        }
-        if (board[lastRow][lastCol] != 0) {
-            return false; // Position already occupied
-        }
-        if (usedNumbers.find(lastNum) != usedNumbers.end()) {
-            return false; // Number already used
-        }
-        if (isPlayer1 && (lastNum % 2 == 0 || lastNum < 1 || lastNum > 9)) {
-            return false; // Player 1 must use odd numbers
-        }
-        if (!isPlayer1 && (lastNum % 2 != 0 || lastNum < 2 || lastNum > 8)) {
-            return false; // Player 2 must use even numbers
-        }
-        return true; // Valid move
+        int row = (move - 1) / 3;
+        int col = (move - 1) % 3;
+        return (move >= 1 && move <= 9 && board[row][col] == 0); // Only check position
     }
 
-    void PositionToRowCol(int move){
-        lastRow = (move - 1) / 3;
-        lastCol = (move - 1) % 3;
+    bool update_board(int move, int num) override {
+        if (!is_valid_move(move) || usedNumbers.count(num) > 0) return false;  // Make sure number isn't used
+        int row = (move - 1) / 3;
+        int col = (move - 1) % 3;
+        board[row][col] = num;
+        usedNumbers.insert(num); // Track used number
+        return true;
+    }
+    bool is_valid_number_for_player(int number, int playerSymbol) {
+        if (usedNumbers.count(number) > 0)
+            return false; // Check if number is already used
+
+        if (playerSymbol == 1 && (number < 1 || number > 9 || number % 2 == 0))
+            return false; // Player 1 uses odd numbers
+
+        if (playerSymbol == 2 && (number < 1 || number > 9 || number % 2 != 0))
+            return false; // Player 2 uses even numbers
+
+        return true;
+    }
+};
+
+
+
+class NumericalTicTacToe_Random_Player : public Player<int> {
+private:
+    Board<int>* boardPtr;
+
+public:
+    NumericalTicTacToe_Random_Player(Board<int>* board, int symbol) : Player<int>(symbol), boardPtr(board) {
+        srand(static_cast<unsigned>(time(0)));
     }
 
-    void setMove(int row, int col, int num, bool currentPlayer) {
-        lastRow = row;
-        lastCol = col;
-        lastNum = num;
-        isPlayer1 = currentPlayer;
-    }
+    void getRandomMove() {
+        int move, number;
 
-    void makeMove(int move) {
-        if (is_valid_move(move)) {
-            board[lastRow][lastCol] = lastNum;
-            usedNumbers.insert(lastNum);
-        } else {
-            cout << "Invalid move. Try again.\n";
+        while (true) {
+            // Generate a random move on the board
+            move = rand() % 9 + 1;
+
+            // Ensure the selected move is valid
+            if (!boardPtr->is_valid_move(move)) {
+                continue; // Retry if the move is already occupied
+            }
+
+            // Select a valid number according to the player's symbol rule
+            do {
+                number = rand() % 9 + 1;  // Random number (1-9)
+            } while (!is_valid_number(number));
+
+            // Once both move and number are valid, update the board
+            if (boardPtr->update_board(move, number)) {
+                break;
+            }
         }
     }
 
-    bool is_win(char currentPlayerSymbol) override {
-        // Check rows for sum = 15
-        for (int i = 0; i < 3; i++) {
-            if (board[i][0] != 0 && board[i][1] != 0 && board[i][2] != 0 &&
-                board[i][0] + board[i][1] + board[i][2] == 15) {
-                return true; // Row win
+    bool is_valid_number(int num) {
+        if (usedNumbers.count(num) > 0) return false;  // Number already used
+        if (symbol == 1 && (num < 1 || num > 9 || num % 2 == 0)) return false; // Player 1 uses odd
+        if (symbol == 2 && (num < 1 || num > 9 || num % 2 != 0)) return false; // Player 2 uses even
+        return true;
+    }
+};
+
+class NumericalTicTacToe_MinMax_Player : public Player<int> {
+private:
+    Board<int>* boardPtr;
+
+public:
+    NumericalTicTacToe_MinMax_Player(Board<int>* board, int symbol) : Player<int>(symbol), boardPtr(board) {}
+
+    pair <int, int> minimax(int depth, bool isMaximizing, int alpha, int beta){
+        int score = evaluate_board();
+
+        // If the AI or the player has already won, return the score
+        if (score == 10 || score == -10) {
+            return make_pair(score, -1);
+        }
+
+        // If no more moves are left, return 0 for draw
+        if (is_board_full()) {
+            return make_pair(0, -1);
+        }
+
+        int bestScore = (isMaximizing) ? -1000 : 1000;
+        int bestMove = -1;
+
+        // Declare AI and player variables
+        char aiPlayer = '2';
+        char player = '1';
+
+        for (int move = 1; move <= 9; move++) {
+            // Check if the move is valid (position is empty and number not used)
+            for (int num = (isMaximizing ? (aiPlayer == '1' ? 1 : 2) : (player == '1' ? 1 : 2));
+                 num <= 9;
+                 num += 2) {
+                if (boardPtr->is_valid_move(move) && is_valid_number_for_player(num,isMaximizing ? aiPlayer : player)) {
+                    // Make the move
+                    boardPtr->update_board(move, num);
+
+                    // Recursively call minimax for the next move
+                    int currentScore = minimax(depth + 1, !isMaximizing, alpha, beta).first;
+
+                    // Undo the move
+                    undo_move(move, num);
+
+                    // Update the best score and best move based on who is maximizing
+                    if (isMaximizing) {
+                        if (currentScore > bestScore) {
+                            bestScore = currentScore;
+                            bestMove = move;
+                        }
+                        alpha = max(alpha, bestScore);
+                    } else {
+                        if (currentScore < bestScore) {
+                            bestScore = currentScore;
+                            bestMove = move;
+                        }
+                        beta = min(beta, bestScore);
+                    }
+
+                    // Alpha-beta pruning
+                    if (beta <= alpha) {
+                        break;
+                    }
+                }
             }
         }
 
-        // Check columns for sum = 15
+        return make_pair(bestScore, bestMove);
+    }
+    bool is_valid_number_for_player(int number, int playerSymbol) {
+        if (usedNumbers.count(number) > 0)
+            return false; // Check if number is already used
+
+        if (playerSymbol == 1 && (number < 1 || number > 9 || number % 2 == 0))
+            return false; // Player 1 uses odd numbers
+
+        if (playerSymbol == 2 && (number < 1 || number > 9 || number % 2 != 0))
+            return false; // Player 2 uses even numbers
+
+        return true;
+    }
+    int evaluate_board() {
+        // Check if Player 2 (AI) or Player 1 (opponent) has won
+        if (boardPtr->is_win(2)) return 10;  // AI win
+        if (boardPtr->is_win(1)) return -10; // Opponent win
+        return 0;  // Draw or ongoing game
+    }
+    void undo_move(int move, int num) {
+        int row = (move - 1) / 3;
+        int col = (move - 1) % 3;
+        boardPtr->board[row][col] = 0; // Reset cell
+        usedNumbers.erase(num);        // Remove number from used list
+    }
+    bool is_board_full() {
         for (int i = 0; i < 3; i++) {
-            if (board[0][i] != 0 && board[1][i] != 0 && board[2][i] != 0 &&
-                board[0][i] + board[1][i] + board[2][i] == 15) {
-                return true; // Column win
+            for (int j = 0; j < 3; j++) {
+                if (boardPtr->board[i][j] == 0) {
+                    return false; // Empty space found
+                }
             }
         }
-
-        // Check diagonals for sum = 15
-        if (board[0][0] != 0 && board[1][1] != 0 && board[2][2] != 0 &&
-            board[0][0] + board[1][1] + board[2][2] == 15) {
-            return true; // Diagonal win (top-left to bottom-right)
-        }
-
-        if (board[0][2] != 0 && board[1][1] != 0 && board[2][0] != 0 &&
-            board[0][2] + board[1][1] + board[2][0] == 15) {
-            return true; // Anti-diagonal win (top-right to bottom-left)
-        }
-
-        return false; // No win found
+        return true; // No empty spaces
     }
-
-    bool is_draw() override{
-
-    };
-
-
-
 };
 
-class Numerical_Tic_Tac_Toe_MinMax_Player : public Player<char>{
 
-};
+void play_vs_player() {
+    NumericalTicTacToe_Board board(3, 3);
+    Player<int> player1(1);  // Odd numbers
+    Player<int> player2(2);  // Even numbers
 
-class Numerical_Tic_Tac_Toe_Random_Player : public Player<char>{
+    while (!board.is_draw()) {
+        board.display_board();
 
-};
+        // Player 1's turn
+        int move, number;
+        do {
+            cout << "Player 1 (odd numbers) enter move (1-9): ";
+            cin >> move;
 
-void PlayerVsComputer(){
+            cout << "Now enter your odd number: ";
+            cin >> number;
 
+            if (!board.is_valid_move(move)) {
+                cout << "Invalid move. Try again." << endl;
+            } else if (!board.is_valid_number_for_player(number, player1.getsymbol())) {
+                cout << "Invalid number for Player 1. Please enter an unused odd number between 1 and 9." << endl;
+            }
+        } while (!board.is_valid_move(move) || !board.is_valid_number_for_player(number, player1.getsymbol()));
+
+        board.update_board(move, number);
+
+        if (board.is_win(player1.getsymbol())) {
+            board.display_board();
+            cout << "Player 1 wins!" << endl;
+            return;
+        }
+
+        if (board.is_draw()) {
+            cout << "It's a draw!" << endl;
+            return;
+        }
+
+        // Player 2's turn
+        board.display_board();
+        do {
+            cout << "Player 2 (even numbers) enter move (1-9): ";
+            cin >> move;
+
+            cout << "Now enter your even number: ";
+            cin >> number;
+
+            if (!board.is_valid_move(move)) {
+                cout << "Invalid move. Try again." << endl;
+            } else if (!board.is_valid_number_for_player(number, player2.getsymbol())) {
+                cout << "Invalid number for Player 2. Please enter an unused even number between 1 and 9." << endl;
+            }
+        } while (!board.is_valid_move(move) || !board.is_valid_number_for_player(number, player2.getsymbol()));
+
+        board.update_board(move, number);
+
+        if (board.is_win(player2.getsymbol())) {
+            board.display_board();
+            cout << "Player 2 wins!" << endl;
+            return;
+        }
+
+        if (board.is_draw()) {
+            cout << "It's a draw!" << endl;
+            return;
+        }
+    }
 }
 
-void PlayerVsPlayer(){
+void play_with_computer() {
+    NumericalTicTacToe_Board board(3, 3);
+    Player<int> player1(1);  // Player 1: Odd numbers, controlled by human
+    bool isPlayerTurn = true;
 
+    string level;
+    cout << endl << "Choose difficulty level:" << endl;
+    cout << "1. Easy" << endl;
+    cout << "2. Hard" << endl;
+    cout << "(1/2) => ";
+    cin >> level;
+
+    if (level == "1") {
+        NumericalTicTacToe_Random_Player randomPlayer(&board, 2);  // AI for easy level
+        while (!board.is_draw() && !board.is_win(1) && !board.is_win(2)) {
+            board.display_board();
+            int move, number;
+            bool validMove = false;
+            if(isPlayerTurn) {
+                do {
+                    cout << "Player 1 (odd numbers) enter move (1-9): ";
+                    cin >> move;
+
+                    cout << "Now enter your odd number: ";
+                    cin >> number;
+
+                    if (!board.is_valid_move(move)) {
+                        cout << "Invalid move. Try again." << endl;
+                    } else if (!board.is_valid_number_for_player(number, player1.getsymbol())) {
+                        cout << "Invalid number for Player 1. Please enter an unused odd number between 1 and 9." << endl;
+                    } else {
+                        validMove = true;
+                    }
+                } while (!validMove);
+
+                board.update_board(move, number);
+
+                if (board.is_win(player1.getsymbol())) {
+                    board.display_board();
+                    cout << "Player 1 wins!" << endl;
+                    return;
+                }
+
+                isPlayerTurn = false;  // Switch to Computer Random Player turn
+            }else{
+                cout << "Computer Random is calculating its move!" <<endl;
+                randomPlayer.getRandomMove();
+                if (board.is_win(randomPlayer.getsymbol())) {
+                    board.display_board();
+                    cout << "Computer Random PLayer wins!" << endl;
+                    return;
+                }
+                isPlayerTurn = true;
+            }
+            if (board.is_draw()) {
+                board.display_board();
+                cout << "It's a draw!" << endl;
+                return;
+            }
+
+
+        }
+
+
+    } else {
+        NumericalTicTacToe_MinMax_Player aiPlayer(&board, 2);  // AI for hard level
+        while (!board.is_draw() && !board.is_win(1) && !board.is_win(2)) {
+            board.display_board();
+
+            if (isPlayerTurn) {
+                // Player 1's move
+                int move, number;
+                bool validMove = false;
+                do {
+                    cout << "Player 1 (odd numbers) enter move (1-9): ";
+                    cin >> move;
+
+                    cout << "Now enter your odd number: ";
+                    cin >> number;
+
+                    if (!board.is_valid_move(move)) {
+                        cout << "Invalid move. Try again." << endl;
+                    } else if (!board.is_valid_number_for_player(number, player1.getsymbol())) {
+                        cout << "Invalid number for Player 1. Please enter an unused odd number between 1 and 9." << endl;
+                    } else {
+                        validMove = true;
+                    }
+                } while (!validMove);
+
+                board.update_board(move, number);
+
+                if (board.is_win(player1.getsymbol())) {
+                    board.display_board();
+                    cout << "Player 1 wins!" << endl;
+                    return;
+                }
+                isPlayerTurn = false;  // Switch to AI turn
+            } else {
+                cout << "AI is calculating its move!" << endl;
+                // AI's single move
+                int bestMove = -1;
+                int bestNumber = -1;
+                int bestScore = -1000;
+
+                for (int move = 1; move <= 9; ++move) {
+                    for (int num = 2; num <= 9; num += 2) {
+                        if (board.is_valid_move(move) && board.is_valid_number_for_player(num, 2)) {
+                            board.update_board(move, num);
+
+                            int moveScore = aiPlayer.minimax(0, false, -1000, 1000).first;
+
+                            if (moveScore > bestScore) {
+                                bestScore = moveScore;
+                                bestMove = move;
+                                bestNumber = num;
+                            }
+
+                            // Undo move
+                            aiPlayer.undo_move(move, num);
+                        }
+                    }
+                }
+
+                if (bestMove != -1 && bestNumber != -1) {
+                    board.update_board(bestMove, bestNumber);
+
+                    if (board.is_win(2)) {
+                        board.display_board();
+                        cout << "AI wins!" << endl;
+                        return;
+                    }
+                }
+
+                isPlayerTurn = true;  // Switch back to player's turn
+            }
+
+            if (board.is_draw()) {
+                board.display_board();
+                cout << "It's a draw!" << endl;
+                return;
+            }
+        }
+    }
 }
 
-void PlayNumTicTacToe(){
+void play_numerical_tic_tac_toe() {
+    int choice;
+    cout << "\nWelcome to Numerical Tic Tac Toe!" << endl;
+    cout << "Choose an option:" << endl;
+    cout << "1. Player vs Player" << endl;
+    cout << "2. Player vs Computer" << endl;
+    cout << "(1/2) => ";
+    cin >> choice;
 
+    if (choice == 1) {
+        cout << "Player 1 is Odd numbers (1, 3, 5, 7, 9), and Player 2, AI Player or Computer Random Player is Even numbers (2, 4, 6, 8)." << endl;
+        play_vs_player();
+    }
+    else if (choice == 2) {
+        cout << "Player 1 is Odd numbers (1, 3, 5, 7, 9), and Player 2, AI Player or Computer Random Player is Even numbers (2, 4, 6, 8)." << endl;
+        play_with_computer();
+    }
+    else {
+        cout << "Invalid choice. Exiting game." << endl;
+    }
 }
 
 #endif
