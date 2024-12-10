@@ -331,8 +331,8 @@ void play_with_computer() {
 
     string level;
     cout << endl << "Choose difficulty level:" << endl;
-    cout << "1. Easy" << endl;
-    cout << "2. Hard" << endl;
+    cout << "1. Computer Random Player" << endl;
+    cout << "2. AI Smart Player" << endl;
     cout << "(1/2) => ";
     cin >> level;
 
