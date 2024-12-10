@@ -37,14 +37,17 @@ public:
     }
     void display_board() override {
         cout << "\n";
+        int position = 1;
+
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
-                if (board[i][j] == 0)
-                    cout << " - ";
-                else
+                if (board[i][j] == ' ') {
+                    cout << " " << position << " ";
+                } else {
                     cout << " " << board[i][j] << " ";
-
+                }
                 if (j < 2) cout << "|";
+                position++;
             }
             cout << "\n";
             if (i < 2) cout << "---|---|---\n";
@@ -412,11 +415,9 @@ void play_Words_tic_tac_toe() {
     cin >> choice;
 
     if (choice == 1) {
-        cout << "Player 1 is Odd numbers (1, 3, 5, 7, 9), and Player 2, AI Player or Computer Random Player is Even numbers (2, 4, 6, 8)." << endl;
         player_vs_player();
     }
     else if (choice == 2) {
-        cout << "Player 1 is Odd numbers (1, 3, 5, 7, 9), and Player 2, AI Player or Computer Random Player is Even numbers (2, 4, 6, 8)." << endl;
         player_vs_computer();
     }
     else {
