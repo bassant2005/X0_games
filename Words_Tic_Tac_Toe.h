@@ -303,8 +303,8 @@ void player_vs_computer(){
     char letter;
     string level;
     cout << endl << "Choose difficulty level:" << endl;
-    cout << "1. Easy" << endl;
-    cout << "2. Hard" << endl;
+    cout << "1. Computer Random Player" << endl;
+    cout << "2. AI Smart Player" << endl;
     cout << "(1/2) => ";
     cin >> level;
     if(level == "1"){
