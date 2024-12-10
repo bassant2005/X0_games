@@ -30,7 +30,7 @@ public:
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
                 if (board[i][j] == 0)
-                    cout << " - ";
+                    cout << " * ";
                 else
                     cout << " " << board[i][j] << " ";
 
@@ -338,6 +338,7 @@ void play_with_computer() {
 
     if (level == "1") {
         NumericalTicTacToe_Random_Player randomPlayer(&board, 2);  // AI for easy level
+        cout << "Player 1 is Odd numbers (1, 3, 5, 7, 9), and Computer Random Player is Even numbers (2, 4, 6, 8)." << endl;
         while (!board.is_draw() && !board.is_win(1) && !board.is_win(2)) {
             board.display_board();
             int move, number;
@@ -390,6 +391,7 @@ void play_with_computer() {
 
     } else {
         NumericalTicTacToe_MinMax_Player aiPlayer(&board, 2);  // AI for hard level
+        cout << "Player 1 is Odd numbers (1, 3, 5, 7, 9), and AI Player is Even numbers (2, 4, 6, 8)." << endl;
         while (!board.is_draw() && !board.is_win(1) && !board.is_win(2)) {
             board.display_board();
 
@@ -479,11 +481,10 @@ void play_numerical_tic_tac_toe() {
     cin >> choice;
 
     if (choice == 1) {
-        cout << "Player 1 is Odd numbers (1, 3, 5, 7, 9), and Player 2, AI Player or Computer Random Player is Even numbers (2, 4, 6, 8)." << endl;
+        cout << "Player 1 is Odd numbers (1, 3, 5, 7, 9), and Player 2 is Even numbers (2, 4, 6, 8)." << endl;
         play_vs_player();
     }
     else if (choice == 2) {
-        cout << "Player 1 is Odd numbers (1, 3, 5, 7, 9), and Player 2, AI Player or Computer Random Player is Even numbers (2, 4, 6, 8)." << endl;
         play_with_computer();
     }
     else {
