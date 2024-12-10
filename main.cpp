@@ -4,6 +4,7 @@
 #include "UltimateTicTacToe.h"
 #include "Numerical_Tic_Tac_Toe.h"
 #include "Words_Tic_Tac_Toe.h"
+#include "misereTicTacToe.h"
 #include <iostream>
 using namespace std;
 
@@ -52,8 +53,7 @@ void GameManager<T>::run() {
             play_numerical_tic_tac_toe();
         }
         else if (gameChoice == 6){
-            //MisereTicTacToe misereTicTacToe;
-            //misereTicTacToe.playGame();
+            playMI();
         }
         else if (gameChoice == 7){
             playU();
