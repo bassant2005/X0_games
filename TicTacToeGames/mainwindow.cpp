@@ -1,27 +1,40 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "newwindow.h" // Include the secondary window
+#include "newwindow.h"
+#include "nplayer.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
-    , newWindow(nullptr) // Initialize the new window pointer
+    , newWindow(nullptr)
+    , nplayer(nullptr)
 {
     ui->setupUi(this);
 }
 
 MainWindow::~MainWindow() {
     delete ui;
-    if (newWindow) delete newWindow; // Clean up the secondary window
+    if (newWindow) delete newWindow;
+    if (nplayer) delete nplayer;
 }
 
 void MainWindow::on_pushButton_clicked() {
-    // Create the new window if it doesn't already exist
-    if (!newWindow) {
-        newWindow = new newwindow(this); // Pass the main window as the parent
+    // Create the `nPlayer` window if it doesn't exist
+    if (!nplayer) {
+        nplayer = new nPlayer(this);
+        connect(nplayer, &nPlayer::choiceMade, this, &MainWindow::handleChoiceMade);
     }
 
-    // Hide the main window and show the new window
-    this->hide();
-    newWindow->show();
+    this->hide();    // Hide the main window
+    nplayer->show(); // Show the `nPlayer` window
+}
+
+void MainWindow::handleChoiceMade() {
+    // Create the `newWindow` if it doesn't exist
+    if (!newWindow) {
+        newWindow = new newwindow(this);
+    }
+
+    nplayer->close();    // Close the `nPlayer` window
+    newWindow->show();   // Show the `newWindow`
 }
