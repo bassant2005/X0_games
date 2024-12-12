@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/res">
+        <file>new.jpg</file>
+        <file>yes.jpg</file>
+        <file>yy.webp</file>
+    </qresource>
+</RCC>
