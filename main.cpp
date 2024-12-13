@@ -5,6 +5,7 @@
 #include "Numerical_Tic_Tac_Toe.h"
 #include "Words_Tic_Tac_Toe.h"
 #include "misereTicTacToe.h"
+#include "T5_5TicTacToe.h"
 #include <iostream>
 using namespace std;
 
@@ -43,8 +44,7 @@ void GameManager<T>::run() {
             playC4();
         }
         else if(gameChoice == 3){
-            // T5_5TicTacToe t5_5TicTacToe;
-            // t5_5TicTacToe.playGame();
+            playFive();
         }
         else if (gameChoice == 4){
             play_Words_tic_tac_toe();
