@@ -89,8 +89,12 @@ class Connect4_MinMax_Player : public Player<char> {
 private:
     Board<char>* boardPtr;
 public:
-    Connect4_MinMax_Player(Board<char>* board, char symbol) : Player<char>(symbol), boardPtr(board) {
+    Connect4_MinMax_Player(Board<char>* board,string name, char symbol) : Player<char>(name,symbol), boardPtr(board) {
         srand(time(0));
+    }
+
+    string getname() override{
+        return name;
     }
 
     void undoMove(int column) {
@@ -168,8 +172,12 @@ class Connect4_Random_Player : public Player<char> {
 private:
     Board<char>* boardPtr;
 public:
-    Connect4_Random_Player(Board<char>* board, char symbol) : Player<char>(symbol), boardPtr(board) {
+    Connect4_Random_Player(Board<char>* board,string name, char symbol) : Player<char>(name,symbol), boardPtr(board) {
         srand(time(0));
+    }
+
+    string getname() override{
+        return name;
     }
 
     int getRandomMove() {
@@ -184,6 +192,7 @@ public:
             int column = availableColumns[rand() % availableColumns.size()];
             return column;
         }
+
         return -1;
     }
 };
@@ -191,21 +200,23 @@ public:
 void playWithComputer() {
     int column;
     string level;
-
+    string player1_name;
     Connect4_Board board(6, 7);
-    Player player("Player 1", 'X');
-    Connect4_Random_Player randomPlayer(&board, 'O');
-    Connect4_MinMax_Player AiPlayer(&board, 'O');
+    cout << "Enter Player X name: ";
+    cin >> player1_name;
+    Player player(player1_name, 'X');
+    Connect4_Random_Player randomPlayer(&board,"Random Computer Player", 'O');
+    Connect4_MinMax_Player AiPlayer(&board,"Smart AI Player", 'O');
 
-    cout << endl << "1. easy" << endl;
-    cout << "2. hard" << endl;
+    cout << endl << "1. Random Computer Player" << endl;
+    cout << "2. Smart AI Player" << endl;
     cout << "(1/2)=>";
     cin >> level;
 
     if (level == "1") {
         while (!board.is_draw()) {
             board.display_board();
-            cout << "Player X enter a column (1-7): ";
+            cout << player.getname() << " (X) enter a column (1-7): ";
             cin >> column;
 
             if (!board.update_board(column - 1, 'X')) {
@@ -215,25 +226,25 @@ void playWithComputer() {
 
             if (board.is_win('X')) {
                 board.display_board();
-                cout << "Player X wins!" << endl;
+                cout << player.getname() << " wins!" << endl;
                 break;
             }
 
-            cout << "Computer is making a move..." << endl;
+            cout << randomPlayer.getname() << " is making a move..." << endl;
             int position = randomPlayer.getRandomMove();
             board.update_board(position, 'O');
             cout << "Computer chose position: " << position << endl;
 
             if (board.is_win('O')) {
                 board.display_board();
-                cout << "Player O wins!" << endl;
+                cout << randomPlayer.getname() <<" wins!" << endl;
                 break;
             }
         }
     } else {
         while (!board.is_draw()) {
             board.display_board();
-            cout << "Player X" << " enter a column (1-7): ";
+            cout << player.getname() << " enter a column (1-7): ";
             cin >> column;
 
             if (!board.update_board(column - 1, 'X')) {
@@ -243,18 +254,18 @@ void playWithComputer() {
 
             if (board.is_win('X')) {
                 board.display_board();
-                cout << "Player X" << " wins!" << endl;
+                cout << player.getname() << " wins!" << endl;
                 break;
             }
 
-            cout << "AI's is making a move..." << endl;
+            cout << AiPlayer.getname() <<"'s is making a move..." << endl;
             int bestMove = AiPlayer.getBestMove();
             board.update_board(bestMove, 'O');
             cout << "AI chose position: " << bestMove << endl;
 
             if (board.is_win('O')) {
                 board.display_board();
-                cout << "AI wins!" << endl;
+                cout << AiPlayer.getname() << " wins!" << endl;
                 break;
             }
         }
@@ -263,13 +274,20 @@ void playWithComputer() {
 
 void playvsplayer() {
     Connect4_Board board(6, 7);
-    Player player1("Player 1", 'X');
-    Player player2("Player 2", 'O');
+    string player1_name, player2_name;
+    cout << "Enter the name of player X: ";
+    cin >> player1_name;
+    cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    cout << "Enter the name of player O: ";
+    cin >> player2_name;
+    cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    Player player1(player1_name, 'X');
+    Player player2(player2_name, 'O');
 
     while (!board.is_draw()) {
         board.display_board();
         int column;
-        cout << "player X enter a column (1-7): ";
+        cout << player1.getname() << " (X) enter a column (1-7): ";
         cin >> column;
 
         if (!board.update_board(column - 1, player1.getsymbol())) {
@@ -279,7 +297,7 @@ void playvsplayer() {
 
         if (board.is_win(player1.getsymbol())) {
             board.display_board();
-            cout << "Player 1 wins!" << endl;
+            cout << player1.getname() <<" wins!" << endl;
             return;
         }
 
@@ -290,7 +308,7 @@ void playvsplayer() {
         }
 
         board.display_board();
-        cout << "player O enter a column (1-7): ";
+        cout << player2.getname() << " (O) enter a column (1-7): ";
         cin >> column;
 
         if (!board.update_board(column - 1, player2.getsymbol())) {
@@ -300,7 +318,7 @@ void playvsplayer() {
 
         if (board.is_win(player2.getsymbol())) {
             board.display_board();
-            cout << "Player 2 wins!" << endl;
+            cout << player2.getname() <<" wins!" << endl;
             return;
         }
 
@@ -331,5 +349,4 @@ void playC4() {
         cout << "Invalid choice. Exiting game." << endl;
     }
 }
-
 #endif
