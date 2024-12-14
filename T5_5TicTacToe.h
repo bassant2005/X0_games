@@ -140,7 +140,11 @@ private:
     TicTacToe5x5* game;
 
 public:
-    TicTacToe5x5_MinMax_Player(TicTacToe5x5* board, char symbol) : Player(symbol), game(board) {}
+    TicTacToe5x5_MinMax_Player(TicTacToe5x5* board,string name, char symbol) : Player(name,symbol), game(board) {}
+
+    string getname() override{
+        return name;
+    }
 
     int evaluateBoard() {
         return game->getScore(getsymbol()) - game->getScore(getsymbol() == 'X' ? 'O' : 'X');
@@ -231,90 +235,23 @@ bool isGameOver(TicTacToe5x5& game) {
     return true;
 }
 
-// int evaluateBoard(TicTacToe5x5& game, char aiPlayer, char humanPlayer) {
-//     // Evaluate the effectiveness of the board for the AI
-//     int aiScore = game.getScore(aiPlayer);
-//     int humanScore = game.getScore(humanPlayer);
-//     return aiScore - humanScore; // AI tries to maximize this difference
-// }
-//
-// int minimax(TicTacToe5x5& game, bool isMaximizing, char aiPlayer, char humanPlayer, int depth, int alpha, int beta) {
-//     // Base case: Check for terminal states
-//     if (game.is_win(aiPlayer)) return 1000 - depth; // Favor quicker wins
-//     if (game.is_win(humanPlayer)) return depth - 1000; // Penalize delayed losses
-//     if (game.is_draw() || depth <= 0) return evaluateBoard(game, aiPlayer, humanPlayer); // Evaluate board score
-//
-//     if (isMaximizing) {
-//         int maxEval = -10000; // Negative infinity
-//         for (int move = 1; move <= 25; ++move) {
-//             if (game.is_valid_move(move)) {
-//                 game.update_board(move, aiPlayer); // Try the move
-//                 int eval = minimax(game, false, aiPlayer, humanPlayer, depth - 1, alpha, beta);
-//                 game.update_board(move, ' '); // Undo the move
-//                 maxEval = max(maxEval, eval);
-//                 alpha = max(alpha, eval);
-//                 if (beta <= alpha) break; // Prune
-//             }
-//         }
-//         return maxEval;
-//     } else {
-//         int minEval = 10000; // Positive infinity
-//         for (int move = 1; move <= 25; ++move) {
-//             if (game.is_valid_move(move)) {
-//                 game.update_board(move, humanPlayer); // Try the move
-//                 int eval = minimax(game, true, aiPlayer, humanPlayer, depth - 1, alpha, beta);
-//                 game.update_board(move, ' '); // Undo the move
-//                 minEval = min(minEval, eval);
-//                 beta = min(beta, eval);
-//                 if (beta <= alpha) break; // Prune
-//             }
-//         }
-//         return minEval;
-//     }
-// }
-//
-// // AI makes the best evaluated move using Minimax
-// int hardAIMove(TicTacToe5x5& game, char aiPlayer, char humanPlayer) {
-//     // Medium AI that uses simple heuristics + randomness
-//     for (int move = 1; move <= 25; ++move) {
-//         if (game.is_valid_move(move)) {
-//             // Opportunistic win/block moves
-//             game.update_board(move, aiPlayer);
-//             if (game.is_win(aiPlayer)) {
-//                 game.update_board(move, ' '); // Undo the move
-//                 return move; // Prioritize winning move
-//             }
-//             game.update_board(move, ' ');
-//
-//             game.update_board(move, humanPlayer);
-//             if (game.is_win(humanPlayer)) {
-//                 game.update_board(move, ' '); // Undo the move
-//                 return move; // Block opponent win
-//             }
-//             game.update_board(move, ' ');
-//         }
-//     }
-//     return easyAIMove(game); // Fallback to random move
-// }
-
 void playerVsPlayer(TicTacToe5x5& game, Player<char>& player1, Player<char>& player2) {
-    char currentPlayer = player1.getsymbol();
+    Player<char>* currentPlayer = &player1; // Start with player1
 
     while (!isGameOver(game)) { // 12 moves per player (24 total moves)
         game.display_board();
         int move;
-        cout << "Player " << ((currentPlayer == player1.getsymbol()) ? "1" : "2")
-             << " (" << currentPlayer << "), enter a move (1-25): ";
+
+        cout << currentPlayer->getname() << " (" << currentPlayer->getsymbol() << "), enter a move (1-25): ";
         cin >> move;
 
-        if (game.update_board(move, currentPlayer)) {
-
+        if (game.update_board(move, currentPlayer->getsymbol())) {
             // Check for a win (Update scores inside is_win function)
             game.is_win(player1.getsymbol());
             game.is_win(player2.getsymbol());
 
-            // Swap player turns
-            currentPlayer = (currentPlayer == player1.getsymbol()) ? player2.getsymbol() : player1.getsymbol();
+            // Switch the current player
+            currentPlayer = (currentPlayer == &player1) ? &player2 : &player1;
         } else {
             cout << "Invalid move! Try again." << endl;
         }
@@ -325,12 +262,13 @@ void playerVsPlayer(TicTacToe5x5& game, Player<char>& player1, Player<char>& pla
     // Update scores and display
     int counterP1 = game.getScore(player1.getsymbol());
     int counterP2 = game.getScore(player2.getsymbol());
-    cout << "Scores:\nPlayer 1 (X) => " << counterP1 << "\nPlayer 2 (O) => " << counterP2 << endl;
+    cout << "Scores:\n" << player1.getname() << " (X) => " << counterP1 << "\n"
+         << player2.getname() << " (O) => " << counterP2 << endl;
 
     if (counterP1 > counterP2) {
-        cout << "Player 1 wins the game!\n";
+        cout << player1.getname() << " wins the game!\n";
     } else if (counterP2 > counterP1) {
-        cout << "Player 2 wins the game!\n";
+        cout << player2.getname() << " wins the game!\n";
     } else {
         cout << "It's a tie...\n";
     }
@@ -343,7 +281,7 @@ void playerVsComputer(TicTacToe5x5& game, Player<char>& humanPlayer, Player<char
         game.display_board();
         if (currentPlayer == humanPlayer.getsymbol()) {
             int move;
-            cout << "Your move (" << humanPlayer.getsymbol() << "), choose a position (1-25): ";
+            cout << "Your move " << humanPlayer.getname() << " (" << humanPlayer.getsymbol() << "), choose a position (1-25): ";
             cin >> move;
 
             if (game.update_board(move, humanPlayer.getsymbol())) {
@@ -355,13 +293,13 @@ void playerVsComputer(TicTacToe5x5& game, Player<char>& humanPlayer, Player<char
                 continue;
             }
         } else {
-            cout << "Computer making a move...\n";
+            cout << computerPlayer.getname() <<" making a move...\n";
             int moveC = easyAIMove(game);
             if (game.update_board(moveC, computerPlayer.getsymbol())) {
                 // Check for a win but continue the game
                 game.is_win(computerPlayer.getsymbol());
             }
-            cout << "Computer chose position " << moveC << endl;
+            cout << computerPlayer.getname() <<" chose position " << moveC << endl;
 
             // Check for a win but continue the game
             game.is_win(computerPlayer.getsymbol());
@@ -376,13 +314,13 @@ void playerVsComputer(TicTacToe5x5& game, Player<char>& humanPlayer, Player<char
     // Update scores and display
     int humanScore = game.getScore(humanPlayer.getsymbol());
     int computerScore = game.getScore(computerPlayer.getsymbol());
-    cout << "Scores:\nYou -> " << humanScore << "\nComputer -> " << computerScore << endl;
+    cout << "Scores:\n"<< humanPlayer.getname() <<" -> " << humanScore << "\n"<< computerPlayer.getname() <<" -> " << computerScore << endl;
 
     // Declare the winner
     if (humanScore > computerScore) {
-        cout << "Congratulations! You won the game." << endl;
+        cout << "Congratulations! "<< humanPlayer.getname() << " won the game." << endl;
     } else if (computerScore > humanScore) {
-        cout << "Computer wins this time." << endl;
+        cout << computerPlayer.getname() <<" wins this time." << endl;
     } else {
         cout << "It's a tie..." << endl;
     }
@@ -395,7 +333,7 @@ void playerVsAI(TicTacToe5x5& game, Player<char>& humanPlayer, TicTacToe5x5_MinM
         game.display_board();
         if (currentPlayer == humanPlayer.getsymbol()) {
             int move;
-            cout << "Your move (" << humanPlayer.getsymbol() << "), choose a position (1-25): ";
+            cout << "Your move " << humanPlayer.getname() << " (" << humanPlayer.getsymbol() << "), choose a position (1-25): ";
             cin >> move;
 
             if (game.update_board(move, humanPlayer.getsymbol())) {
@@ -407,7 +345,7 @@ void playerVsAI(TicTacToe5x5& game, Player<char>& humanPlayer, TicTacToe5x5_MinM
                 continue;
             }
         } else {
-            cout << "AI making a move...\n";
+            cout << aiPlayer.getname() <<" making a move...\n";
             int moveAI = aiPlayer.getBestMove();
             if (game.update_board(moveAI, aiPlayer.getsymbol())) {
                 // Check for a win but continue the game
@@ -428,13 +366,12 @@ void playerVsAI(TicTacToe5x5& game, Player<char>& humanPlayer, TicTacToe5x5_MinM
     // Update scores and display
     int humanScore = game.getScore(humanPlayer.getsymbol());
     int computerScore = game.getScore(aiPlayer.getsymbol());
-    cout << "Scores:\nYou -> " << humanScore << "\nAI -> " << computerScore << endl;
-
+    cout << "Scores:\n"<< humanPlayer.getname() <<" -> " << humanScore << "\n"<< aiPlayer.getname() <<" -> " << computerScore << endl;
     // Declare the winner
     if (humanScore > computerScore) {
-        cout << "Congratulations! You won the game." << endl;
+        cout << "Congratulations! "<< humanPlayer.getname() << " won the game." << endl;
     } else if (computerScore > humanScore) {
-        cout << "AI wins this time." << endl;
+        cout << aiPlayer.getname() <<" wins this time." << endl;
     } else {
         cout << "It's a tie..." << endl;
     }
@@ -445,25 +382,35 @@ void playerVsAI(TicTacToe5x5& game, Player<char>& humanPlayer, TicTacToe5x5_MinM
 void playFive() {
     TicTacToe5x5 game;
     game.initializeBoard();
-
-    Player<char> player1('X'), player2('O');
-
+    string player1_name, player2_name;
     string mode;
-    cout << "Choose mode:\n1. Player vs Player\n2. Player vs Computer\n3. Player vs AI\n=> ";
+    cout << "Choose mode:\n1. Player vs Player\n2. Player vs Random Computer Player\n3. Player vs Smart AI Player\n=> ";
     cin >> mode;
 
     if (mode == "1") {
+        cout << "Enter the name of player X: ";
+        cin >> player1_name;
+        cout << "Enter the name of player O: ";
+        cin >> player2_name;
+        Player<char> player1(player1_name,'X');
+        Player<char> player2(player2_name,'O');
         playerVsPlayer(game, player1, player2);
     } else if (mode == "2") {
+        cout << "Enter the name of player X: ";
+        cin >> player1_name;
+        Player<char> player1(player1_name,'X');
+        Player<char> player2("Random Computer player",'O');
         playerVsComputer(game, player1, player2);
     } else if (mode == "3") {
-        TicTacToe5x5_MinMax_Player aiPlayer(&game, 'O');
+        cout << "Enter the name of player X: ";
+        cin >> player1_name;
+        Player<char> player1(player1_name,'X');
+        TicTacToe5x5_MinMax_Player aiPlayer(&game,"Smart AI Player", 'O');
         playerVsAI(game, player1, aiPlayer);
     } else {
         cout << "Invalid mode selected!" << endl;
     }
     cout << endl;
 }
-
 
 #endif // T5_5TICTACTOE_H
