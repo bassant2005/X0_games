@@ -1,5 +1,6 @@
 #ifndef _PYRAMID_X_O_H
 #define _PYRAMID_X_O_H
+
 #include "BoardGame_Classes.h"
 
 class Pyramid_X_O_Board : public Board<char> {
@@ -217,7 +218,7 @@ void playGameWithComputer() {
         while (!board.is_draw()) {
             board.display_board();
             int position;
-            cout << "player " << player.getname() << " (X) enter your position :";
+            cout << player.getname() << " (X) enter your position :";
             cin >> position;
 
             if (!board.update_board(position, player.getsymbol())) {
@@ -227,7 +228,7 @@ void playGameWithComputer() {
 
             if (board.is_win('X')) {
                 board.display_board();
-                cout << "Player " << player.getname() << " wins!" << endl;
+                cout << player.getname() << " wins!" << endl;
                 return;
             }
 
@@ -258,7 +259,7 @@ void playGameWithComputer() {
         while (!board.is_draw()) {
             board.display_board();
             int position;
-            cout << "player " << player.getname() << " enter your position :";
+            cout << player.getname() << " (X) enter your position :";
             cin >> position;
 
             if (!board.update_board(position, player.getsymbol())) {
@@ -313,7 +314,7 @@ void PlayWithPlayer() {
     while (!board.is_draw()) {
         board.display_board();
         int position;
-        cout << "player " << player1.getname() << " (X) enter your position :";
+        cout << player1.getname() << " (X) enter your position :";
         cin >> position;
 
         if (!board.update_board(position, player1.getsymbol())) {
@@ -334,7 +335,7 @@ void PlayWithPlayer() {
         }
 
         board.display_board();
-        cout << "player " << player2.getname() << " (O) enter your position :";
+        cout << player2.getname() << " (O) enter your position :";
         cin >> position;
 
         if (!board.update_board(position, player2.getsymbol())) {
