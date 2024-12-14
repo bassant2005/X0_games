@@ -1,6 +1,5 @@
 #ifndef _PYRAMID_X_O_H
 #define _PYRAMID_X_O_H
-
 #include "BoardGame_Classes.h"
 
 class Pyramid_X_O_Board : public Board<char> {
@@ -88,7 +87,11 @@ class Pyramid_X_O_AI_Player : public Player<char> {
 private:
     Board<char>* boardPtr;
 public:
-    Pyramid_X_O_AI_Player(Board<char>* board, char symbol) : Player(symbol), boardPtr(board) {}
+    Pyramid_X_O_AI_Player(Board<char>* board,string name, char symbol) : Player(name,symbol), boardPtr(board) {}
+
+    string getname() override{
+        return name;
+    }
 
     int evaluateBoard() {
         if (boardPtr->is_win(boardPtr->currentPlayerSymbol)) {
@@ -163,8 +166,14 @@ public:
 };
 
 class Pyramid_X_O_Random_Player : public Board<char> {
+private:
+    string name;
 public:
-    Pyramid_X_O_Random_Player(int r, int c, char i) : Board(r, c) {}
+    Pyramid_X_O_Random_Player(int r, int c,string name, char i) : Board(r, c) {}
+
+    string getname(){
+        return name;
+    }
 
     char getRandomMove() {
         vector<int> availableMoves;
@@ -186,23 +195,29 @@ public:
 };
 
 void playGameWithComputer() {
+    string player1_name;
+    cout << "Enter Player X name: ";
+    cin >> player1_name;
+    Pyramid_X_O_Board board(3, 5);  // 3 rows and 5 columns for pyramid board
+    Player player(player1_name, 'X');
+    Pyramid_X_O_Random_Player randomPlayer(3, 5,"Random Computer Player", 'O');
+    Pyramid_X_O_AI_Player AiPlayer(&board,"Smart AI Player", 'O');
+
+
     string level;
-    cout << endl << "1. easy" << endl;
-    cout << "2. hard" << endl;
+    cout << endl << "1. Random Computer Player" << endl;
+    cout << "2. Smart AI Player" << endl;
     cout << "(1/2)=>";
     cin >> level;
 
-    Pyramid_X_O_Board board(3, 5);  // 3 rows and 5 columns for pyramid board
-    Player player("Player 1", 'X');
-    Pyramid_X_O_Random_Player randomPlayer(3, 5, 'O');
-    Pyramid_X_O_AI_Player AiPlayer(&board, 'O');
+
 
     if (level == "1") {
         // Easy mode (random moves)
         while (!board.is_draw()) {
             board.display_board();
             int position;
-            cout << "player X enter your position :";
+            cout << "player " << player.getname() << " (X) enter your position :";
             cin >> position;
 
             if (!board.update_board(position, player.getsymbol())) {
@@ -212,7 +227,7 @@ void playGameWithComputer() {
 
             if (board.is_win('X')) {
                 board.display_board();
-                cout << "Player 1 wins!" << endl;
+                cout << "Player " << player.getname() << " wins!" << endl;
                 return;
             }
 
@@ -222,14 +237,14 @@ void playGameWithComputer() {
                 break;
             }
 
-            cout << "Computer is making a move..." << endl;
+            cout << randomPlayer.getname() <<" is making a move..." << endl;
             position = randomPlayer.getRandomMove();
             board.update_board(position, 'O');
 
             cout << "Computer chose position: " << position << endl;
 
             if (board.is_win('O')) {
-                cout << "Computer wins!" << endl;
+                cout << randomPlayer.getname() <<" wins!" << endl;
                 break;
             }
 
@@ -243,7 +258,7 @@ void playGameWithComputer() {
         while (!board.is_draw()) {
             board.display_board();
             int position;
-            cout << "player X enter your position :";
+            cout << "player " << player.getname() << " enter your position :";
             cin >> position;
 
             if (!board.update_board(position, player.getsymbol())) {
@@ -253,7 +268,7 @@ void playGameWithComputer() {
 
             if (board.is_win('X')) {
                 board.display_board();
-                cout << "Player 1 wins!" << endl;
+                cout << player.getname() <<" wins!" << endl;
                 return;
             }
 
@@ -263,15 +278,14 @@ void playGameWithComputer() {
                 break;
             }
 
-            cout << "AI is making a move..." << endl;
+            cout << AiPlayer.getname() <<" is making a move..." << endl;
             position = AiPlayer.getBestMove() - '0';
 
             board.update_board(position, 'O');
-            cout << "AI choose " << position << endl;
 
             if (board.is_win('O')) {
                 board.display_board();
-                cout << "AI wins!" << endl;
+                cout << AiPlayer.getname() <<" wins!" << endl;
                 return;
             }
 
@@ -285,14 +299,21 @@ void playGameWithComputer() {
 }
 
 void PlayWithPlayer() {
-    Pyramid_X_O_Board board(3, 5);
-    Player player1("Player 1", 'X');
-    Player player2("Player 2", 'O');
+    Pyramid_X_O_Board board(3, 5);  // 3 rows and 5 columns for pyramid board
+    string player1_name, player2_name;
+    cout << "Enter the name of player X: ";
+    cin >> player1_name;
+    cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    cout << "Enter the name of player O: ";
+    cin >> player2_name;
+    cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    Player player1(player1_name, 'X');
+    Player player2(player2_name, 'O');
 
     while (!board.is_draw()) {
         board.display_board();
         int position;
-        cout << "player X enter your position :";
+        cout << "player " << player1.getname() << " (X) enter your position :";
         cin >> position;
 
         if (!board.update_board(position, player1.getsymbol())) {
@@ -302,7 +323,7 @@ void PlayWithPlayer() {
 
         if (board.is_win(player1.getsymbol())) {
             board.display_board();
-            cout << "Player 1 wins!" << endl;
+            cout << player1.getname() <<" wins!" << endl;
             return;
         }
 
@@ -313,7 +334,7 @@ void PlayWithPlayer() {
         }
 
         board.display_board();
-        cout << "player O enter your position :";
+        cout << "player " << player2.getname() << " (O) enter your position :";
         cin >> position;
 
         if (!board.update_board(position, player2.getsymbol())) {
@@ -323,7 +344,7 @@ void PlayWithPlayer() {
 
         if (board.is_win(player2.getsymbol())) {
             board.display_board();
-            cout << "Player 2 wins!" << endl;
+            cout << player2.getname() <<" wins!" << endl;
             return;
         }
 
@@ -354,6 +375,5 @@ void playPY() {
         cout << "Invalid choice. Exiting game." << endl;
     }
 }
-
 
 #endif
