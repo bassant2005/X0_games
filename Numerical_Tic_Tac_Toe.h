@@ -116,8 +116,11 @@ private:
     Board<int>* boardPtr;
 
 public:
-    NumericalTicTacToe_Random_Player(Board<int>* board, int symbol) : Player<int>(symbol), boardPtr(board) {
+    NumericalTicTacToe_Random_Player(Board<int>* board,string name, int symbol) : Player<int>(name,symbol), boardPtr(board) {
         srand(static_cast<unsigned>(time(0)));
+    }
+    string getname() override{
+        return name;
     }
 
     void getRandomMove() {
@@ -157,7 +160,11 @@ private:
     Board<int>* boardPtr;
 
 public:
-    NumericalTicTacToe_MinMax_Player(Board<int>* board, int symbol) : Player<int>(symbol), boardPtr(board) {}
+    NumericalTicTacToe_MinMax_Player(Board<int>* board,string name, int symbol) : Player<int>(name,symbol), boardPtr(board) {}
+
+    string getname() override{
+        return name;
+    }
 
     pair <int, int> minimax(int depth, bool isMaximizing, int alpha, int beta){
         int score = evaluate_board();
@@ -258,8 +265,15 @@ public:
 
 void play_vs_player() {
     NumericalTicTacToe_Board board(3, 3);
-    Player<int> player1(1);  // Odd numbers
-    Player<int> player2(2);  // Even numbers
+    string player1_name, player2_name;
+    cout << "Enter the name of player 1: ";
+    cin >> player1_name;
+    cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    cout << "Enter the name of player 2: ";
+    cin >> player2_name;
+    cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    Player<int> player1(player1_name,1);  // Odd numbers
+    Player<int> player2(player2_name,2);  // Even numbers
 
     while (!board.is_draw()) {
         board.display_board();
@@ -267,7 +281,7 @@ void play_vs_player() {
         // Player 1's turn
         int move, number;
         do {
-            cout << "Player 1 (odd numbers) enter move (1-9): ";
+            cout << "Player " << player1.getname() << " (odd numbers) enter move (1-9): ";
             cin >> move;
 
             cout << "Now enter your odd number: ";
@@ -284,7 +298,7 @@ void play_vs_player() {
 
         if (board.is_win(player1.getsymbol())) {
             board.display_board();
-            cout << "Player 1 wins!" << endl;
+            cout << player1.getname() <<" wins!" << endl;
             return;
         }
 
@@ -296,7 +310,7 @@ void play_vs_player() {
         // Player 2's turn
         board.display_board();
         do {
-            cout << "Player 2 (even numbers) enter move (1-9): ";
+            cout << "Player "<< player2.getname() << " (even numbers) enter move (1-9): ";
             cin >> move;
 
             cout << "Now enter your even number: ";
@@ -313,7 +327,7 @@ void play_vs_player() {
 
         if (board.is_win(player2.getsymbol())) {
             board.display_board();
-            cout << "Player 2 wins!" << endl;
+            cout << player2.getname() << " wins!" << endl;
             return;
         }
 
@@ -326,7 +340,12 @@ void play_vs_player() {
 
 void play_with_computer() {
     NumericalTicTacToe_Board board(3, 3);
-    Player<int> player1(1);  // Player 1: Odd numbers, controlled by human
+    string player1_name;
+    NumericalTicTacToe_Random_Player randomPlayer(&board,"Random Computer Player", 2);  // AI for easy level
+    NumericalTicTacToe_MinMax_Player aiPlayer(&board,"Smart AI Player", 2);  // AI for hard level
+    cout << "Enter Player 1 name: ";
+    cin >> player1_name;
+    Player<int> player1(player1_name,1);  // Player 1: Odd numbers, controlled by human
     bool isPlayerTurn = true;
 
     string level;
@@ -337,15 +356,14 @@ void play_with_computer() {
     cin >> level;
 
     if (level == "1") {
-        NumericalTicTacToe_Random_Player randomPlayer(&board, 2);  // AI for easy level
-        cout << "Player 1 is Odd numbers (1, 3, 5, 7, 9), and Computer Random Player is Even numbers (2, 4, 6, 8)." << endl;
+        cout << "Player "<< player1.getname() <<" is Odd numbers (1, 3, 5, 7, 9), and "<< randomPlayer.getname() <<" is Even numbers (2, 4, 6, 8)." << endl;
         while (!board.is_draw() && !board.is_win(1) && !board.is_win(2)) {
             board.display_board();
             int move, number;
             bool validMove = false;
             if(isPlayerTurn) {
                 do {
-                    cout << "Player 1 (odd numbers) enter move (1-9): ";
+                    cout << "Player "<< player1.getname() <<" (odd numbers) enter move (1-9): ";
                     cin >> move;
 
                     cout << "Now enter your odd number: ";
@@ -364,17 +382,17 @@ void play_with_computer() {
 
                 if (board.is_win(player1.getsymbol())) {
                     board.display_board();
-                    cout << "Player 1 wins!" << endl;
+                    cout << player1.getname() <<" wins!" << endl;
                     return;
                 }
 
                 isPlayerTurn = false;  // Switch to Computer Random Player turn
             }else{
-                cout << "Computer Random is calculating its move!" <<endl;
+                cout << randomPlayer.getname() <<" is calculating its move!" <<endl;
                 randomPlayer.getRandomMove();
                 if (board.is_win(randomPlayer.getsymbol())) {
                     board.display_board();
-                    cout << "Computer Random PLayer wins!" << endl;
+                    cout << randomPlayer.getname() <<" wins!" << endl;
                     return;
                 }
                 isPlayerTurn = true;
@@ -390,8 +408,7 @@ void play_with_computer() {
 
 
     } else {
-        NumericalTicTacToe_MinMax_Player aiPlayer(&board, 2);  // AI for hard level
-        cout << "Player 1 is Odd numbers (1, 3, 5, 7, 9), and AI Player is Even numbers (2, 4, 6, 8)." << endl;
+        cout << "Player "<< player1.getname() <<" is Odd numbers (1, 3, 5, 7, 9), and "<< aiPlayer.getname() <<" is Even numbers (2, 4, 6, 8)." << endl;
         while (!board.is_draw() && !board.is_win(1) && !board.is_win(2)) {
             board.display_board();
 
@@ -400,7 +417,7 @@ void play_with_computer() {
                 int move, number;
                 bool validMove = false;
                 do {
-                    cout << "Player 1 (odd numbers) enter move (1-9): ";
+                    cout << "Player "<< player1.getname() <<" (odd numbers) enter move (1-9): ";
                     cin >> move;
 
                     cout << "Now enter your odd number: ";
@@ -419,12 +436,12 @@ void play_with_computer() {
 
                 if (board.is_win(player1.getsymbol())) {
                     board.display_board();
-                    cout << "Player 1 wins!" << endl;
+                    cout << player1.getname() <<" wins!" << endl;
                     return;
                 }
                 isPlayerTurn = false;  // Switch to AI turn
             } else {
-                cout << "AI is calculating its move!" << endl;
+                cout << aiPlayer.getname() <<" is calculating its move!" << endl;
                 // AI's single move
                 int bestMove = -1;
                 int bestNumber = -1;
@@ -454,7 +471,7 @@ void play_with_computer() {
 
                     if (board.is_win(2)) {
                         board.display_board();
-                        cout << "AI wins!" << endl;
+                        cout << aiPlayer.getname() <<" wins!" << endl;
                         return;
                     }
                 }
