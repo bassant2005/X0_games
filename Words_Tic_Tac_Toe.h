@@ -113,7 +113,10 @@ class WordsTicTacToe_Random_player : public Player<char>{
 private:
     Board<char>* boardPtr;
 public:
-    WordsTicTacToe_Random_player(Board<char>* board, char symbol) : Player<char>(symbol), boardPtr(board){
+    WordsTicTacToe_Random_player(Board<char>* board,string name, char symbol) : Player<char>(name,symbol), boardPtr(board){
+    }
+    string getname() override{
+        return name;
     }
     int computer_random_move(){
         int move;
@@ -140,7 +143,11 @@ class WordsTicTacTOe_MinMax_Player : public Player<char>{
 private:
     Board<char>* boardPtr;
 public:
-    WordsTicTacTOe_MinMax_Player(Board<char>* board, char symbol) : Player<char>(symbol), boardPtr(board) {}
+    WordsTicTacTOe_MinMax_Player(Board<char>* board,string name, char symbol) : Player<char>(name,symbol), boardPtr(board) {}
+
+    string getname() override{
+        return name;
+    }
 
     int score_word_formation(const string& line) {
         if (line.size() < 3) return 0; // No need to check shorter lines
@@ -231,88 +238,104 @@ public:
     }
 };
 
-void player_vs_player(){
-    WordsTicTacToe_Board board(3,3);
-    Player<char> player1('X');
-    Player<char> player2('O');
-
+void player_vs_player() {
+    WordsTicTacToe_Board board(3, 3);
+    string player1_name, player2_name;
+    cout << "Enter the name of player 1: ";
+    cin >> player1_name;
+    cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    cout << "Enter the name of player 2: ";
+    cin >> player2_name;
+    cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    Player<char> player1(player1_name, 'X');
+    Player<char> player2(player2_name, 'O');
     int move;
     char letter;
     board.display_board();
-    while (!board.is_draw()){
+
+    while (!board.is_draw()) {
         // Player X's turn
-        cout << "Player " << player1.getsymbol() << ", it's your turn!\n";
-        cout << "Enter the letter you want to place (A-Z): ";
-        cin >> letter;
-        letter = toupper(letter); // Ensure the letter is uppercase
+        while (true) { // Loop to ensure valid input
+            cout << "Player " << player1.getname() << ", it's your turn!\n";
+            cout << "Enter the letter you want to place (A-Z): ";
+            cin >> letter;
+            cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            cout << "Enter the position (1-9) for your move: ";
+            cin >> move;
+            cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            letter = toupper(letter); // Ensure the letter is uppercase
 
-        cout << "Enter the position (1-9) for your move: ";
-        cin >> move;
-        if(board.is_valid_move(move) && board.is_valid_letter(letter)){
-            board.update_board(move,letter);
-            board.display_board();
-
-            if (board.is_win(player1.getsymbol())) {
+            if (board.is_valid_move(move) && board.is_valid_letter(letter)) {
+                board.update_board(move, letter);
                 board.display_board();
-                cout << "Player 1 wins!" << endl;
-                return;
-            }
 
-            if (board.is_draw()) {
-                cout << "It's a draw!" << endl;
-                return;
+                if (board.is_win(player1.getsymbol())) {
+                    cout << "Player " << player1.getname() << " wins!" << endl;
+                    return;
+                }
+                break; // Exit the loop for Player X's turn
+            } else {
+                cout << "Invalid move or letter. Please try again." << endl;
             }
-        }else{
-            cout << "Invalid move. Please try again." << endl;
         }
+
+        if (board.is_draw()) {
+            cout << "It's a draw!" << endl;
+            return;
+        }
+
         // Player O's turn
-        cout << "Player " << player2.getsymbol() << ", it's your turn!\n";
-        cout << "Enter the letter you want to place (A-Z): ";
-        cin >> letter;
-        letter = toupper(letter); // Ensure the letter is uppercase
+        while (true) { // Loop to ensure valid input
+            cout << "Player " << player2.getname() << ", it's your turn!\n";
+            cout << "Enter the letter you want to place (A-Z): ";
+            cin >> letter;
+            cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            letter = toupper(letter); // Ensure the letter is uppercase
+            cout << "Enter the position (1-9) for your move: ";
+            cin >> move;
+            cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
-        cout << "Enter the position (1-9) for your move: ";
-        cin >> move;
-        if(board.is_valid_move(move) && board.is_valid_letter(letter)){
-            board.update_board(move,letter);
-            board.display_board();
-
-            if (board.is_win(player1.getsymbol())) {
+            if (board.is_valid_move(move) && board.is_valid_letter(letter)) {
+                board.update_board(move, letter);
                 board.display_board();
-                cout << "Player 2 wins!" << endl;
-                return;
-            }
 
-            if (board.is_draw()) {
-                cout << "It's a draw!" << endl;
-                return;
+                if (board.is_win(player2.getsymbol())) {
+                    cout << "Player " << player2.getname() << " wins!" << endl;
+                    return;
+                }
+                break; // Exit the loop for Player O's turn
+            } else {
+                cout << "Invalid move or letter. Please try again." << endl;
             }
-        }else{
-            cout << "Invalid move. Please try again." << endl;
         }
-
     }
+
+    cout << "It's a draw!" << endl;
 }
 void player_vs_computer(){
     WordsTicTacToe_Board board(3, 3);
-    WordsTicTacToe_Random_player random_player(&board,'O');
-    WordsTicTacTOe_MinMax_Player ai_player(&board,'O');
-    Player<char> player1('X');  // Player 1: Odd numbers, controlled by human
+    string player1_name;
+    WordsTicTacToe_Random_player random_player(&board,"Random Computer Player",'O');
+    WordsTicTacTOe_MinMax_Player ai_player(&board,"Smart AI Player",'O');
+    cout << "Enter Player 1 name: ";
+    cin >> player1_name;
+    Player<char> player1(player1_name,'X');  // Player 1: Odd numbers, controlled by human
     bool is_player_turn = true;
     int move;
     char letter;
     string level;
     cout << endl << "Choose difficulty level:" << endl;
-    cout << "1. Computer Random Player" << endl;
-    cout << "2. AI Smart Player" << endl;
+    cout << "1. Random Computer Player" << endl;
+    cout << "2. Smart AI Player" << endl;
     cout << "(1/2) => ";
     cin >> level;
     if(level == "1"){
         while (!board.is_draw() && !board.is_win('X') && !board.is_win('O')) {
             board.display_board();
             if(is_player_turn) {
+
                 // Player's turn
-                cout << "Player " << player1.getsymbol() << ", it's your turn!\n";
+                cout << "Player " << player1.getname() << ", it's your turn!\n";
                 cout << "Enter the letter you want to place (A-Z): ";
                 cin >> letter;
                 letter = toupper(letter); // Ensure the letter is uppercase
@@ -324,7 +347,7 @@ void player_vs_computer(){
 
                     if (board.is_win(player1.getsymbol())) {
                         board.display_board();
-                        cout << "Player 1 wins!" << endl;
+                        cout << player1.getname() <<" wins!" << endl;
                         return;
                     }
 
@@ -338,12 +361,13 @@ void player_vs_computer(){
                 is_player_turn = false;
             }else {
                 // Computer Random Player's turn
-                cout << "Computer's turn...\n";
+                cout << random_player.getname() <<"'s turn...\n";
+
                 random_player.computer_random_move();
 
                 if (board.is_win(random_player.getsymbol())) {
                     board.display_board();
-                    cout << "Computer Random Player wins!" << endl;
+                    cout << random_player.getname() <<" wins!" << endl;
                     return;
                 }
 
@@ -359,7 +383,7 @@ void player_vs_computer(){
             board.display_board();
             if(is_player_turn) {
                 // Player's turn
-                cout << "Player " << player1.getsymbol() << ", it's your turn!\n";
+                cout << "Player " << player1.getname() << ", it's your turn!\n";
                 cout << "Enter the letter you want to place (A-Z): ";
                 cin >> letter;
                 letter = toupper(letter); // Ensure the letter is uppercase
@@ -371,7 +395,7 @@ void player_vs_computer(){
 
                     if (board.is_win(player1.getsymbol())) {
                         board.display_board();
-                        cout << "Player 1 wins!" << endl;
+                        cout << player1.getname() <<" wins!" << endl;
                         return;
                     }
 
@@ -385,12 +409,12 @@ void player_vs_computer(){
                 is_player_turn = false;
             }else {
                 // AI's Turn
-                cout << "AI is thinking...\n";
+                cout << ai_player.getname() <<" is thinking...\n";
                 auto [bestMove, bestLetter] = ai_player.findBestMove();
                 board.update_board(bestMove, bestLetter);
                 if (board.is_win(ai_player.getsymbol())) {
                     board.display_board();
-                    cout << "AI wins!" << endl;
+                    cout << ai_player.getname() <<" wins!" << endl;
                     return;
                 }
 
