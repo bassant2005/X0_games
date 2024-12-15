@@ -15,7 +15,7 @@ public:
     void run();
 };
 
-//........IMPLEMENTATION
+//IMPLEMENTATION
 
 template <typename T>
 void GameManager<T>::run() {
@@ -38,10 +38,10 @@ void GameManager<T>::run() {
         cin >> gameChoice;
 
         if (gameChoice == 1) {
-            playPY();
+            play_Pyramid_tictactoe();
         }
         else if (gameChoice == 2) {
-            playC4();
+            play_Connect4();
         }
         else if(gameChoice == 3){
             playFive();
@@ -53,7 +53,7 @@ void GameManager<T>::run() {
             play_numerical_tic_tac_toe();
         }
         else if (gameChoice == 6){
-            playMI();
+            playMisere();
         }
         else if (gameChoice == 7){
             playU();
@@ -71,6 +71,7 @@ void GameManager<T>::run() {
     }
 }
 
+////=> the main function////
 int main() {
     GameManager<char> game;
     game.run();
