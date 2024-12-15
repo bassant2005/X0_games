@@ -26,7 +26,7 @@ public:
     void display_board() override {
         cout << endl;
         int num = 1;
-
+        //display the board cells as numbers
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
                 if (board[i][j] == ' ') {
@@ -52,13 +52,14 @@ public:
 
 
     bool is_win(char currentPlayerSymbol) override {
-        // Check rows, columns, and diagonals for "SUS"
+        // Check rows, columns, for "SUS"
         for (int i = 0; i < 3; i++) {
             if ((this->board[i][0] == 'S' && this->board[i][1] == 'U' && this->board[i][2] == 'S') ||
                 (this->board[0][i] == 'S' && this->board[1][i] == 'U' && this->board[2][i] == 'S')) {
                 return true;
             }
         }
+
         // Diagonals
         if ((this->board[0][0] == 'S' && this->board[1][1] == 'U' && this->board[2][2] == 'S') ||
             (this->board[0][2] == 'S' && this->board[1][1] == 'U' && this->board[2][0] == 'S')) {
@@ -68,6 +69,7 @@ public:
     }
 
     bool update_board(int n, char symbol) override {
+        //set the position as a col 7 ROW
         if (n < 1 || n > 9) return false;
         int row = (n - 1) / 3;
         int col = (n - 1) % 3;
@@ -88,7 +90,7 @@ public:
         return true;
     }
 
-
+    //=>function to count the number of correct sus every player made
     void countSUS(int position, char currentPlayerLetter) {
         int row = (position - 1) / 3;
         int col = (position - 1) % 3;
@@ -122,6 +124,7 @@ public:
             scoreOpponent += n_moves;
         }
     }
+
     void display_count(string player1 , string player2){
         cout << "The board is full!\n";
         cout << player1 <<  " 's Score (" << playerLetter << "): " << scorePlayer << "\n";
@@ -234,7 +237,7 @@ public:
         cin >> player_name;
         Player player(player_name, 'S');
 
-        currentPlayerSymbol = playerLetter; // Start with the player
+        currentPlayerSymbol = playerLetter;
 
         while (!is_draw()) {
             if (currentPlayerSymbol == playerLetter) {
@@ -259,7 +262,7 @@ public:
 
                 cout << "Computer is making a move..." << endl;
                 update_board(position, opponentLetter);
-                countSUS(position, opponentLetter);  // Update score for the computer
+                countSUS(position, opponentLetter);
                 cout << "Computer choose " << position << endl;
                 cout << endl;
                 display_board();
@@ -271,7 +274,7 @@ public:
 };
 
 void PlayVSPlayer() {
-    SUS_X_O_Board board(3, 3);  // 3 rows and 3 columns for a standard board
+    SUS_X_O_Board board(3, 3);
     string player1_name, player2_name;
     cout << "Player vs Player Mode!\n";
 
@@ -291,7 +294,6 @@ void PlayVSPlayer() {
 
     board.display_board();
 
-    // Variables to track the current player
     char currentSymbol = board.playerLetter;
     string currentPlayerName = player1.getname();
 
@@ -300,27 +302,23 @@ void PlayVSPlayer() {
 
         cout << currentPlayerName << " (" << currentSymbol << ") ";
 
-        // Get move from the current player
         if (currentSymbol == 'S') {
             player1.getmove(position);
         } else {
             player2.getmove(position);
         }
 
-        // Validate and process the move
         if (board.is_valid_move(position)) {
             board.update_board(position, currentSymbol);
             board.display_board();
 
             board.countSUS(position, currentSymbol); // Process the move
 
-            // Check for a draw
             if (board.is_draw()) {
                 board.display_count(player1.getname(),player2.getname());
                 break;
             }
 
-            // Switch players
             if (currentSymbol == board.playerLetter) {
                 currentSymbol = board.opponentLetter;
                 currentPlayerName = player2.getname();
@@ -339,7 +337,6 @@ void playSUS() {
     SUS_X_O_Board board(3, 3);
     SUS_X_O_AI_Player AI( 3, 3, 3, 3);
     SUS_X_O_Random_Player random( 3, 3, 3, 3);
-
 
     cout << "Welcome to SuS Game!" << endl;
     cout << "Choose a game mode:" << endl;
