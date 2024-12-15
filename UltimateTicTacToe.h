@@ -190,8 +190,8 @@ void PWithC() {
     string player1_name;
     cout << "Enter Player X name: ";
     cin >> player1_name;
-    Player<int> player1(player1_name,'X');  // Player 1: Odd numbers, controlled by human
-    ultemate_X_O_Random_Player randomPlayer(3, 3,"Random Computer Player",'O');
+    Player player(player1_name,'X');
+    ultemate_X_O_Random_Player randomPlayer(3, 3,"Computer",'O');
 
     int largePosition, smallPosition;
     int largeRow, largeCol, smallRow, smallCol;
@@ -200,7 +200,7 @@ void PWithC() {
         board.display_board();
 
         // Player's turn
-        cout << player1.getname() <<"'s turn.\n";
+        cout << player.getname() <<"'s turn.\n";
         cout << "Enter the large board position (1-9): ";
         cin >> largePosition;
 
@@ -238,7 +238,7 @@ void PWithC() {
 
         if (board.is_win('X')) {
             board.displayBoard();
-            cout << player1.getname() << " wins the game!\n";
+            cout << player.getname() << " wins the game!\n";
             break;
         }
 
@@ -272,13 +272,20 @@ void PWithP() {
     cout << "Enter the name of player 2: ";
     cin >> player2_name;
     ultimate_X_O_Board board(3, 3);
+    Player player1(player1_name,'X') , player2(player2_name,'O');
 
     int largePosition, smallPosition;
     int largeRow, largeCol, smallRow, smallCol;
 
     while (!board.gameOver) {
         board.display_board();
-        cout << "Player " << board.currentPlayerSymbol << "'s turn." << endl;
+        if(board.currentPlayerSymbol == 'X') {
+            cout << "Player " << player1.getname() << "'s turn." << endl;
+        }
+        else{
+            cout << "Player " << player2.getname() << "'s turn." << endl;
+        }
+
         cout << "Enter the large board position (1-9): ";
         cin >> largePosition;
 
@@ -310,18 +317,31 @@ void PWithP() {
         if (board.checkWin(subBoard)) {
             board.mainboard[largeRow][largeCol] = board.currentPlayerSymbol;
             board.displayBoard();
+
             if (board.is_win(' ')) {
-                cout << "Player " << board.currentPlayerSymbol << " wins the game!" << endl;
+                if(board.currentPlayerSymbol == 'X') {
+                    cout << "Player " << player1.getname() << " wins the game!" << endl;
+                }
+                else{
+                    cout << "Player " << player2.getname() << " wins the game!" << endl;
+                }
+
                 board.gameOver = true;
                 break;
             }
-        } else if (board.checkDraw(subBoard)) {
+        }
+        else if (board.checkDraw(subBoard)) {
             board.mainboard[largeRow][largeCol] = 'D';
             board.displayBoard();
         }
 
         if (board.is_win(' ')) {
-            cout << "Player " << board.currentPlayerSymbol << " wins the game!" << endl;
+            if(board.currentPlayerSymbol == 'X') {
+                cout << "Player " << player1.getname() << " wins the game!" << endl;
+            }
+            else{
+                cout << "Player " << player2.getname() << " wins the game!" << endl;
+            }
             board.gameOver = true;
             break;
         }
@@ -337,7 +357,7 @@ void PWithP() {
 
 void playU() {
     int choice;
-    cout << "Welcome to Pyramid Tic-Tac-Toe!" << endl;
+    cout << "Welcome to ultimate Tic-Tac-Toe!" << endl;
     cout << "Choose an option:" << endl;
     cout << "1. Player vs Player" << endl;
     cout << "2. Player vs Computer" << endl;
