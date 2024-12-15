@@ -8,7 +8,9 @@ public:
     Connect4_Board(int i, int i1) : Board<char>(6, 7) {
         initializeBoard();
     }
+
     void initializeBoard() override {
+        //initialize Board cells with -'s
         for (int i = 0; i < 6; i++) {
             for (int j = 0; j < 7; j++) {
                 this->board[i][j] = '-';
@@ -17,6 +19,7 @@ public:
     }
 
     bool update_board(int x, char symbol) override {
+        //update the user input cell with the current symbol
         if (x < 0 || x >= 7) return false;
         for (int row = 5; row >= 0; row--) {
             if (board[row][x] == '-') {
@@ -39,6 +42,7 @@ public:
     }
 
     bool is_win(char currentPlayerSymbol) override {
+        // Check horizontally for four in a row
         for (int i = 0; i < 6; i++) {
             for (int j = 0; j < 4; j++) {
                 if (board[i][j] == currentPlayerSymbol && board[i][j + 1] == currentPlayerSymbol &&
@@ -47,6 +51,7 @@ public:
             }
         }
 
+        // Check vertically for four in a row
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 7; j++) {
                 if (board[i][j] == currentPlayerSymbol && board[i + 1][j] == currentPlayerSymbol &&
@@ -55,6 +60,7 @@ public:
             }
         }
 
+        // Check diagonally (bottom-left to top-right) for four in a row
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 4; j++) {
                 if (board[i][j] == currentPlayerSymbol && board[i + 1][j + 1] == currentPlayerSymbol &&
@@ -63,6 +69,7 @@ public:
             }
         }
 
+        // Check diagonally (top-left to bottom-right) for four in a row
         for (int i = 3; i < 6; i++) {
             for (int j = 0; j < 4; j++) {
                 if (board[i][j] == currentPlayerSymbol && board[i - 1][j + 1] == currentPlayerSymbol &&
@@ -93,12 +100,9 @@ public:
         srand(time(0));
     }
 
-    string getname() override{
-        return name;
-    }
-
     void undoMove(int column) {
         for (int row = 0; row < 6; row++) {
+            // If a piece is found, remove it by setting it to '-'
             if (boardPtr->board[row][column] != '-') {
                 boardPtr->board[row][column] = '-';
                 break;
@@ -107,37 +111,58 @@ public:
     }
 
     int evaluateBoard() {
+        // Check if 'O' (maximizing player) has won
         if (boardPtr->is_win('O')) return 1000;
+        // Check if 'X' (minimizing player) has won
         if (boardPtr->is_win('X')) return -1000;
+        // Return 0 if no win condition is met
         return 0;
     }
 
     int minimax(int depth, bool isMaximizing) {
+
         int score = evaluateBoard();
+
+        // If a terminal state is reached return the score
         if (score == 1000 || score == -1000 || boardPtr->is_draw() || depth == 0) {
             return score;
         }
 
         if (isMaximizing) {
+            // Maximizing player's move (trying to maximize score for 'O')
             int bestScore = -10000;
+
             for (int col = 0; col < 7; col++) {
+                // Check if the column is a valid move
                 if (boardPtr->is_valid_move(col)) {
+                    // Make a temporary move
                     boardPtr->update_board(col, 'O');
+
                     this->symbol = (this->symbol == 'X') ? 'O' : 'X';
-                    bestScore = std::max(bestScore, minimax(depth - 1, false));
+
+                    // Recursively call minimax for the minimizing player's turn
+                    bestScore = max(bestScore, minimax(depth - 1, false));
+
                     this->symbol = (this->symbol == 'X') ? 'O' : 'X';
                     undoMove(col);
                 }
             }
             return bestScore;
-        }
-        else {
+        } else {
+            // Minimizing player's move (trying to minimize score for 'X')
             int bestScore = 10000;
+
+            // Iterate over all columns
             for (int col = 0; col < 7; col++) {
                 if (boardPtr->is_valid_move(col)) {
+                    // Make a temporary move
                     boardPtr->update_board(col, 'X');
+
                     this->symbol = (this->symbol == 'X') ? 'O' : 'X';
-                    bestScore = std::min(bestScore, minimax(depth - 1, true));
+
+                    bestScore = min(bestScore, minimax(depth - 1, true));
+
+                    // Undo the move and restore the original state
                     this->symbol = (this->symbol == 'X') ? 'O' : 'X';
                     undoMove(col);
                 }
@@ -150,20 +175,31 @@ public:
         int bestScore = -10000;
         int bestMove = -1;
 
+        // Iterate over all columns on the board
         for (int col = 0; col < 7; col++) {
+            // Check if the column is a valid move
             if (boardPtr->is_valid_move(col)) {
+                // Make a temporary move
                 boardPtr->update_board(col, 'O');
+
                 this->symbol = (this->symbol == 'X') ? 'O' : 'X';
+
+                // Evaluate the move using minimax
                 int moveScore = minimax(5, false);
+
+                // Undo the move and restore the original state
                 this->symbol = (this->symbol == 'X') ? 'O' : 'X';
                 undoMove(col);
 
+                // Update the best move if the score is better
                 if (moveScore > bestScore) {
                     bestScore = moveScore;
                     bestMove = col;
                 }
             }
         }
+
+        // Return the column index of the best move found
         return bestMove;
     }
 };
@@ -175,11 +211,7 @@ public:
     Connect4_Random_Player(Board<char>* board,string name, char symbol) : Player<char>(name,symbol), boardPtr(board) {
         srand(time(0));
     }
-
-    string getname() override{
-        return name;
-    }
-
+    //check all the available Moves
     int getRandomMove() {
         vector<int> availableColumns;
         for (int col = 0; col < 7; col++) {
@@ -187,7 +219,7 @@ public:
                 availableColumns.push_back(col);
             }
         }
-
+        //get a random one
         if (!availableColumns.empty()) {
             int column = availableColumns[rand() % availableColumns.size()];
             return column;
@@ -197,16 +229,19 @@ public:
     }
 };
 
+//=> play with computer modes
 void playWithComputer() {
     int column;
     string level;
     string player1_name;
     Connect4_Board board(6, 7);
+
     cout << "Enter Player X name: ";
     cin >> player1_name;
+
     Player player(player1_name, 'X');
-    Connect4_Random_Player randomPlayer(&board,"Random Computer Player", 'O');
-    Connect4_MinMax_Player AiPlayer(&board,"Smart AI Player", 'O');
+    Connect4_Random_Player randomPlayer(&board,"Computer", 'O');
+    Connect4_MinMax_Player AiPlayer(&board,"AI", 'O');
 
     cout << endl << "1. Random Computer Player" << endl;
     cout << "2. Smart AI Player" << endl;
@@ -272,15 +307,17 @@ void playWithComputer() {
     }
 }
 
+//=> play with player mode
 void playvsplayer() {
     Connect4_Board board(6, 7);
     string player1_name, player2_name;
+
     cout << "Enter the name of player X: ";
     cin >> player1_name;
-    cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
     cout << "Enter the name of player O: ";
     cin >> player2_name;
-    cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
     Player player1(player1_name, 'X');
     Player player2(player2_name, 'O');
 
@@ -330,7 +367,8 @@ void playvsplayer() {
     }
 }
 
-void playC4() {
+//=>play the game
+void play_Connect4() {
     int choice;
     cout << "Welcome to Connect 4!" << endl;
     cout << "Choose an option:" << endl;
