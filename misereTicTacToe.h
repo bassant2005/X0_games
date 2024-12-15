@@ -192,15 +192,28 @@ public:
 };
 
 void playerVsPlayer(MisereTicTacToe &game) {
-    char player1Symbol = 'X', player2Symbol = 'O';
+//    char player1Symbol = 'X', player2Symbol = 'O';
+    string name1,name2;
+    cout << "player1 enter your name: ";
+    cin >> name1;
+    Player player1(name1,'X');
+    cout << "player2 enter your name: ";
+    cin >> name2;
+    Player player2(name2,'O');
+    game.setPlayerSymbols(player1.getsymbol(), player2.getsymbol());
 
-    game.setPlayerSymbols(player1Symbol, player2Symbol);
-
-    while (!game.is_win(player1Symbol) && !game.is_win(player2Symbol) && !game.is_draw()) {
+    while (!game.is_win(player1.getsymbol()) && !game.is_win(player2.getsymbol()) && !game.is_draw()) {
         game.display_board();
         int pos;
-        cout << "Player " << (game.get_current_symbol() == player1Symbol ? "1" : "2")
-             << ", enter your move (1-9): ";
+
+        if( game.get_current_symbol() == player1.getsymbol()) {
+            cout << "Player " << player1.getname() << "'s turn." << endl;
+        }
+        else{
+            cout << "Player " << player2.getname() << "'s turn." << endl;
+        }
+
+        cout <<" enter your move (1-9): ";
         cin >> pos;
 
         if (game.update_board(pos, game.get_current_symbol())) {
@@ -211,11 +224,11 @@ void playerVsPlayer(MisereTicTacToe &game) {
     }
 
     game.display_board();
-    if (game.is_win(player1Symbol)) {
-        cout << "Player 2 Wins!\n";
+    if (game.is_win(player1.getsymbol())) {
+        cout << player1.getname() <<" Wins!\n";
     }
-    else if (game.is_win(player2Symbol)) {
-        cout << "Player 1 Wins!\n";
+    else if (game.is_win(player2.getsymbol())) {
+        cout << player2.getname() <<" Wins!\n";
     }
     else {
         cout << "It's a Draw.\n";
@@ -223,38 +236,41 @@ void playerVsPlayer(MisereTicTacToe &game) {
 }
 
 void playerVsComputer(MisereTicTacToe &game) {
-    char playerSymbol = 'X', aiSymbol = 'O';
 
-    game.setPlayerSymbols(playerSymbol, aiSymbol);
+    string name;
+    cout << "enter your name: ";
+    cin >> name;
+    Player player(name,'X');
+    game.setPlayerSymbols(player.getsymbol(), 'O');
 
-    while (!game.is_win(playerSymbol) && !game.is_win(aiSymbol) && !game.is_draw()) {
+    while (!game.is_win(player.getsymbol()) && !game.is_win('O') && !game.is_draw()) {
         int row, col;
         game.display_board();
-        if (game.get_current_symbol() == playerSymbol) {
+        if (game.get_current_symbol() == player.getsymbol()) {
             int pos;
-            cout << "Player, enter your move (1-9): ";
+            cout << player.getname() <<" enter your move (1-9): ";
             cin >> pos;
 
-            if (game.update_board(pos, playerSymbol)) {
+            if (game.update_board(pos, player.getsymbol())) {
                 game.switch_turn();
             } else {
                 cout << "Invalid move! Try again.\n";
             }
         } else {
             game.easyAI(row, col);
-            game.update_board_auto(row, col, aiSymbol);
+            game.update_board_auto(row, col, 'O');
             game.switch_turn();
             cout << "Computer move to (" << row * 3 + col + 1 << ").\n";
         }
     }
 
-    if (game.is_win(playerSymbol)) {
+    if (game.is_win(player.getsymbol())) {
         game.display_board();
         cout << "Computer wins!\n";
     }
-    else if (game.is_win(aiSymbol)) {
+    else if (game.is_win('O')) {
         game.display_board();
-        cout << "Player wins!\n";
+        cout << player.getname() << " wins!\n";
     }
     else {
         game.display_board();
@@ -263,45 +279,48 @@ void playerVsComputer(MisereTicTacToe &game) {
 }
 
 void playerVsAI(MisereTicTacToe &game) {
-    char playerSymbol = 'X', aiSymbol = 'O';
 
-    game.setPlayerSymbols(playerSymbol, aiSymbol);
+    string name;
+    cout << "enter your name: ";
+    cin >> name;
+    Player player(name,'X');
+    game.setPlayerSymbols(player.getsymbol(), 'O');
 
-    while (!game.is_win(playerSymbol) && !game.is_win(aiSymbol) && !game.is_draw()) {
+    while (!game.is_win(player.getsymbol()) && !game.is_win('O') && !game.is_draw()) {
         game.display_board();
-        if (game.get_current_symbol() == playerSymbol) {
+        if (game.get_current_symbol() == player.getsymbol()) {
             int pos;
-            cout << "Player, enter your move (1-9): ";
+            cout << player.getname() <<" enter your move (1-9): ";
             cin >> pos;
 
-            if (game.update_board(pos, playerSymbol)) {
+            if (game.update_board(pos, player.getsymbol())) {
                 game.switch_turn();
             } else {
                 cout << "Invalid move! Try again.\n";
             }
         } else {
             int row, col;
-            game.hardAI(aiSymbol, playerSymbol, row, col);
-            game.update_board_auto(row, col, aiSymbol);
+            game.hardAI('O', player.getsymbol(), row, col);
+            game.update_board_auto(row, col, 'O');
             game.switch_turn();
             cout << "AI move to (" << row * 3 + col + 1 << ").\n";
         }
     }
 
-    if (game.is_win(playerSymbol)) {
+    if (game.is_win(player.getsymbol())) {
         game.display_board();
         cout << "AI wins!\n";
     }
-    else if (game.is_win(aiSymbol)) {
+    else if (game.is_win('O')) {
         game.display_board();
-        cout << "Player wins!\n";
+        cout << player.getname() << " wins!\n";
     }
     else {
         cout << "It's a Draw.\n";
     }
 }
 
-void playMI() {
+void playMisere() {
     MisereTicTacToe game;
     cout << "Welcome to Misere Tic Tac Toe!" << endl;
     cout << "Choose a mode:\n1. Player vs Player\n2. Player vs Easy Computer\n3. Player vs Hard AI\n=> ";
