@@ -3,9 +3,9 @@
 
 #include "BoardGame_Classes.h"
 
-class ultemate_X_O_Board : public Board<char> {
+class ultimate_X_O_Board : public Board<char>{
 public:
-    ultemate_X_O_Board(int r, int c) : Board<char>(r, c) {
+    ultimate_X_O_Board(int r, int c) : Board<char>(r, c) {
         initializeBoard();
         currentPlayerSymbol = 'X';
     }
@@ -141,10 +141,13 @@ public:
     }
 };
 
-class ultemate_X_O_Random_Player : public ultemate_X_O_Board {
+class ultemate_X_O_Random_Player : public ultimate_X_O_Board, public Player<char> {
 public:
-    ultemate_X_O_Random_Player(int r1, int c1) : ultemate_X_O_Board(r1, c1) {
+    ultemate_X_O_Random_Player(int r1, int c1, string name,char symbol) : ultimate_X_O_Board(r1, c1), Player<char>(name,symbol) {
         srand(time(0));
+    }
+    string getname() override{
+        return name;
     }
 
     void getRandomMove(char sharedBoard[9][9], char sharedMainboard[3][3], char currentPlayerSymbol) {
@@ -183,8 +186,12 @@ public:
 };
 
 void PWithC() {
-    ultemate_X_O_Board board(3, 3);
-    ultemate_X_O_Random_Player randomPlayer(3, 3);
+    ultimate_X_O_Board board(3, 3);
+    string player1_name;
+    cout << "Enter Player X name: ";
+    cin >> player1_name;
+    Player<int> player1(player1_name,'X');  // Player 1: Odd numbers, controlled by human
+    ultemate_X_O_Random_Player randomPlayer(3, 3,"Random Computer Player",'O');
 
     int largePosition, smallPosition;
     int largeRow, largeCol, smallRow, smallCol;
@@ -193,7 +200,7 @@ void PWithC() {
         board.display_board();
 
         // Player's turn
-        cout << "Player X's turn.\n";
+        cout << player1.getname() <<"'s turn.\n";
         cout << "Enter the large board position (1-9): ";
         cin >> largePosition;
 
@@ -231,7 +238,7 @@ void PWithC() {
 
         if (board.is_win('X')) {
             board.displayBoard();
-            cout << "Player X wins the game!\n";
+            cout << player1.getname() << " wins the game!\n";
             break;
         }
 
@@ -246,7 +253,7 @@ void PWithC() {
         randomPlayer.getRandomMove(board.board, board.mainboard, board.currentPlayerSymbol);
 
         if (board.is_win('O')) {
-            cout << "Player O wins the game!\n";
+            cout << randomPlayer.getname() <<  " wins the game!\n";
             break;
         }
 
@@ -259,7 +266,12 @@ void PWithC() {
 }
 
 void PWithP() {
-    ultemate_X_O_Board board(3, 3);
+    string player1_name, player2_name;
+    cout << "Enter the name of player 1: ";
+    cin >> player1_name;
+    cout << "Enter the name of player 2: ";
+    cin >> player2_name;
+    ultimate_X_O_Board board(3, 3);
 
     int largePosition, smallPosition;
     int largeRow, largeCol, smallRow, smallCol;
