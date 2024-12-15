@@ -3,8 +3,6 @@
 
 #include "BoardGame_Classes.h"
 
-#include "BoardGame_Classes.h"
-
 class SUS_X_O_Board : public Board<char> {
 public:
     char playerLetter = 'S';
