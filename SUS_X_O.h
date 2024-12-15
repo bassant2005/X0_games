@@ -3,6 +3,8 @@
 
 #include "BoardGame_Classes.h"
 
+#include "BoardGame_Classes.h"
+
 class SUS_X_O_Board : public Board<char> {
 public:
     char playerLetter = 'S';
@@ -48,7 +50,7 @@ public:
         int row = (position - 1) / 3;
         int col = (position - 1) % 3;
         return (position >= 1 && position <= 9 && board[row][col] != 'S' && board[row][col] != 'U');
-}
+    }
 
 
     bool is_win(char currentPlayerSymbol) override {
@@ -260,40 +262,72 @@ public:
 };
 
 void PlayVSPlayer() {
-    SUS_X_O_Board board(3, 3);  // 3 rows and 5 columns for pyramid board
-    Player player1("Player 1", 'S');
-    Player player2("Player 2", 'U');
-
+    SUS_X_O_Board board(3, 3);  // 3 rows and 3 columns for a standard board
+    string player1_name, player2_name;
     cout << "Player vs Player Mode!\n";
-    cout << "Player 1 is '" << board.playerLetter << "' and Player 2 is '" << board.opponentLetter << "'.\n";
+
+    // Get player names
+    cout << "Enter the name of player 1: ";
+    cin >> player1_name;
+    cout << "Enter the name of player 2: ";
+    cin >> player2_name;
+
+    // Initialize players
+    Player player1(player1_name, 'S');
+    Player player2(player2_name, 'U');
+    player1.setBoard(&board);
+    player2.setBoard(&board);
+
+    cout << player1.getname() << " is '" << board.playerLetter << "' and " << player2.getname() << " is '" << board.opponentLetter << "'.\n";
 
     board.display_board();
 
-    board.currentPlayerSymbol = player1.getsymbol(); // Start with Player 1
+
+    // Variables to track the current player
+    char currentSymbol = board.playerLetter;
+    string currentPlayerName = player1.getname();
 
     while (true) {
-
         int position;
-        cout << "Player " << "(" << board.currentPlayerSymbol << "), choose a position (1-9): ";
+
+        // Display current player's turn
+        cout << currentPlayerName << " (" << currentSymbol << "), choose a position (1-9): ";
         cin >> position;
 
-        if (board.is_valid_move(position)) {
+        // Get move from the current player
+        if (currentSymbol == 'S') {
+            player1.getmove(position);
+        } else {
+            player2.getmove(position);
+        }
 
-            board.update_board(position, board.currentPlayerSymbol);
+        // Validate and process the move
+        if (board.is_valid_move(position)) {
+            board.update_board(position, currentSymbol);
             board.display_board();
 
-            board.countSUS(position, board.currentPlayerSymbol); // Pass last move's position
-            // Check if the board is full
+            board.countSUS(position, currentSymbol); // Process the move
+
+            // Check for a draw
             if (board.is_draw()) {
                 board.display_count();
                 break;
             }
-            board.currentPlayerSymbol = (board.currentPlayerSymbol == board.playerLetter) ? board.opponentLetter :board.playerLetter;
+
+            // Switch players
+            if (currentSymbol == board.playerLetter) {
+                currentSymbol = board.opponentLetter;
+                currentPlayerName = player2.getname();
+            } else {
+                currentSymbol = board.playerLetter;
+                currentPlayerName = player1.getname();
+            }
         } else {
             cout << "Invalid move. Please try again.\n";
         }
     }
 }
+
 
 void playSUS() {
     SUS_X_O_Board board(3, 3);
@@ -319,8 +353,8 @@ void playSUS() {
 
 
         cout << "Choose AI difficulty:" << endl;
-        cout << "1. Easy" << endl;
-        cout << "2. Hard" << endl;
+        cout << "1. Random Computer Player" << endl;
+        cout << "2. Hard AI Player" << endl;
         cout << "=> ";
 
         int aiChoice;
@@ -344,4 +378,3 @@ void playSUS() {
 }
 
 #endif
-
