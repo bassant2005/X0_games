@@ -15,6 +15,7 @@ template <typename T>
 class Board {
 protected:
     int rows, columns;
+    int n_moves = 0;
 
 public:
     Board(int r, int c) : rows(r), columns(c) {
@@ -52,11 +53,18 @@ protected:
 public:
     Player(string n, T symbol);
     Player(T symbol);
+    void getmove(int& x) {
+        cout << "Enter position: ";
+        cin >> x;
+    }
+    virtual void getmove(int& x,int& y);
     T getsymbol(){
         return symbol;
     }
 
-    string getname();
+    virtual void setname(const string &playerName); // Setter for name
+    virtual string getname(); // Getter for name
+    void setBoard(Board<T>* b);
 };
 
 template <typename T>
@@ -89,6 +97,19 @@ template <typename T>
 string Player<T>::getname() {
     return name;
 }
+
+template <typename T>
+void Player<T>::setname(const string &playerName) {
+    name = playerName;
+}
+
+template <typename T>
+void Player<T>::setBoard(Board<T>* b) {
+    boardPtr = b;
+}
+
+template <typename T>
+void Player<T>:: getmove(int& x, int& y) {}
 
 template class Player<char>;
 
