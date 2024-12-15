@@ -122,16 +122,16 @@ public:
             scoreOpponent += n_moves;
         }
     }
-    void display_count(){
+    void display_count(string player1 , string player2){
         cout << "The board is full!\n";
-        cout << "Player S's Score (" << playerLetter << "): " << scorePlayer << "\n";
-        cout << "Player U's Score (" << opponentLetter << "): " << scoreOpponent << "\n";
+        cout << player1 <<  " 's Score (" << playerLetter << "): " << scorePlayer << "\n";
+        cout << player2 << " 's Score (" << opponentLetter << "): " << scoreOpponent << "\n";
 
         if (scorePlayer > scoreOpponent) {
-            cout << "Player S wins!\n";
+            cout << player1 <<" wins!\n";
         }
         else if (scorePlayer < scoreOpponent) {
-            cout << "Player U wins!\n";
+            cout << player2 <<" wins!\n";
         }
         else {
             cout << "It's a draw!\n";
@@ -145,6 +145,11 @@ public:
     SUS_X_O_AI_Player(int r1, int c1, int r, int c) : SUS_X_O_Board(r1, c1) {}
 
     void hardAI() {
+        string player_name;
+        cout << "Enter the name of player 1: ";
+        cin >> player_name;
+        Player player(player_name, 'S');
+
         currentPlayerSymbol = playerLetter;
         int row, col;
 
@@ -152,7 +157,7 @@ public:
             if (currentPlayerSymbol == playerLetter) {
                 // Player's turn
                 int position;
-                cout << "Your turn (" << playerLetter << "). Choose a position (1-9): ";
+                cout << "Your turn " << player.getname() << ". Choose a position (1-9): ";
                 cin >> position;
 
                 if (is_valid_move(position)) {
@@ -213,7 +218,7 @@ public:
             }
             currentPlayerSymbol = (currentPlayerSymbol == playerLetter) ? opponentLetter : playerLetter;
         }
-        display_count();
+        display_count(player.getname(),"AI");
     }
 };
 
@@ -223,12 +228,18 @@ public:
     SUS_X_O_Random_Player(int r1, int c1, int r, int c) : SUS_X_O_Board(r1, c1) {}
 
     void getRandomMove() {
+
+        string player_name;
+        cout << "Enter the name of player 1: ";
+        cin >> player_name;
+        Player player(player_name, 'S');
+
         currentPlayerSymbol = playerLetter; // Start with the player
 
         while (!is_draw()) {
             if (currentPlayerSymbol == playerLetter) {
                 int position;
-                cout << "Your turn (" << playerLetter << "). Choose a position (1-9): ";
+                cout << "Your turn " << player.getname() << ". Choose a position (1-9): ";
                 cin >> position;
 
                 if (is_valid_move(position)) {
@@ -255,7 +266,7 @@ public:
             }
             currentPlayerSymbol = (currentPlayerSymbol == playerLetter) ? opponentLetter : playerLetter;
         }
-        display_count();
+        display_count(player.getname(),"computer");
     }
 };
 
@@ -280,7 +291,6 @@ void PlayVSPlayer() {
 
     board.display_board();
 
-
     // Variables to track the current player
     char currentSymbol = board.playerLetter;
     string currentPlayerName = player1.getname();
@@ -288,9 +298,7 @@ void PlayVSPlayer() {
     while (true) {
         int position;
 
-        // Display current player's turn
-        cout << currentPlayerName << " (" << currentSymbol << "), choose a position (1-9): ";
-        cin >> position;
+        cout << currentPlayerName << " (" << currentSymbol << ") ";
 
         // Get move from the current player
         if (currentSymbol == 'S') {
@@ -308,7 +316,7 @@ void PlayVSPlayer() {
 
             // Check for a draw
             if (board.is_draw()) {
-                board.display_count();
+                board.display_count(player1.getname(),player2.getname());
                 break;
             }
 
@@ -332,6 +340,7 @@ void playSUS() {
     SUS_X_O_AI_Player AI( 3, 3, 3, 3);
     SUS_X_O_Random_Player random( 3, 3, 3, 3);
 
+
     cout << "Welcome to SuS Game!" << endl;
     cout << "Choose a game mode:" << endl;
     cout << "1. Player vs Player" << endl;
@@ -347,10 +356,7 @@ void playSUS() {
     else if (mode == 2) {
         cout << "Player vs Computer Mode!\n";
 
-        cout << "\nYou are 'S' " << "and the computer is 'U'" << ".\n";
-
-
-        cout << "Choose AI difficulty:" << endl;
+        cout << "Choose Computer difficulty:" << endl;
         cout << "1. Random Computer Player" << endl;
         cout << "2. Hard AI Player" << endl;
         cout << "=> ";
