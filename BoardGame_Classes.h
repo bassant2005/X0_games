@@ -9,15 +9,14 @@
 #include <vector>
 using namespace std;
 
-#pragma once
 
 template <typename T>
 class Board {
 protected:
     int rows, columns;
-    int n_moves = 0;
 
 public:
+
     Board(int r, int c) : rows(r), columns(c) {
         board = new T*[rows];
         for (int i = 0; i < rows; ++i) {
@@ -52,21 +51,23 @@ protected:
 
 public:
     Player(string n, T symbol);
-    Player(T symbol);
+
     void getmove(int& x) {
         cout << "Enter position: ";
         cin >> x;
     }
+
     virtual void getmove(int& x,int& y);
+
     T getsymbol(){
         return symbol;
     }
 
-    virtual void setname(const string &playerName); // Setter for name
-    virtual string getname(); // Getter for name
+    virtual string getname();
     void setBoard(Board<T>* b);
 };
 
+//initial implementation for class board functions
 template <typename T>
 void Board<T>::initializeBoard() {}
 
@@ -87,20 +88,13 @@ bool Board<T>::update_board(int n, T symbol) {}
 
 template class Board<char>;
 
+//initial implementation for class player functions
 template <typename T>
 Player<T>::Player(string n, T symbol) : name(n), symbol(symbol), boardPtr(nullptr) {}
 
 template <typename T>
-Player<T>::Player(T symbol) : name("Computer"), symbol(symbol), boardPtr(nullptr) {}
-
-template <typename T>
 string Player<T>::getname() {
     return name;
-}
-
-template <typename T>
-void Player<T>::setname(const string &playerName) {
-    name = playerName;
 }
 
 template <typename T>
@@ -113,4 +107,4 @@ void Player<T>:: getmove(int& x, int& y) {}
 
 template class Player<char>;
 
-#endif //_BOARDGAME_CLASSES_H
+#endif
