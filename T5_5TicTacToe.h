@@ -137,65 +137,79 @@ public:
 
 class TicTacToe5x5_MinMax_Player : public Player<char> {
 private:
-    TicTacToe5x5* game;
+    TicTacToe5x5* game; // Pointer to the game board for this player.
 
 public:
-    TicTacToe5x5_MinMax_Player(TicTacToe5x5* board,string name, char symbol) : Player(name,symbol), game(board) {}
+    // Constructor
+    TicTacToe5x5_MinMax_Player(TicTacToe5x5* board, string name, char symbol)
+            : Player(name, symbol), game(board) {}
 
-    string getname() override{
+    //method to return the player's name.
+    string getname() override {
         return name;
     }
 
+    // Evaluates the board from the player's perspective
     int evaluateBoard() {
         return game->getScore(getsymbol()) - game->getScore(getsymbol() == 'X' ? 'O' : 'X');
     }
 
+    // Minimax algorithm with alpha-beta pruning.
+    // depth: How far to look ahead in the game tree.
+    // isMaximizing: Whether the current turn is maximizing the player's score.
+    // alpha: The best value the maximizer can guarantee.
+    // beta: The best value the minimizer can guarantee.
     int minimax(int depth, bool isMaximizing, int alpha, int beta) {
         char currentSymbol = isMaximizing ? getsymbol() : (getsymbol() == 'X' ? 'O' : 'X');
 
-        if (game->is_win(getsymbol())) return 1000 - depth;
-        if (game->is_win(currentSymbol)) return depth - 1000;
+        // Base cases: Check for win, loss, draw, or depth limit.
+        if (game->is_win(getsymbol())) return 1000 - depth; // Favor winning quickly.
+        if (game->is_win(currentSymbol)) return depth - 1000; // Penalize losing.
         if (game->is_draw() || depth <= 0) return evaluateBoard();
 
+        // Maximizing player's turn.
         if (isMaximizing) {
             int maxEval = -10000;
             for (int move = 1; move <= 25; ++move) {
                 if (game->is_valid_move(move)) {
-                    game->update_board(move, getsymbol());
-                    int eval = minimax(depth - 1, false, alpha, beta);
-                    undoMove(move);
-                    maxEval = max(maxEval, eval);
-                    alpha = max(alpha, eval);
-                    if (beta <= alpha) break;
+                    game->update_board(move, getsymbol()); // Make a move.
+                    int eval = minimax(depth - 1, false, alpha, beta); // Recursively evaluate.
+                    undoMove(move); // Undo the move.
+                    maxEval = max(maxEval, eval); // Update the max evaluation.
+                    alpha = max(alpha, eval); // Update alpha.
+                    if (beta <= alpha) break; // Prune the search tree.
                 }
             }
             return maxEval;
-        } else {
+        }
+            // Minimizing player's turn.
+        else {
             int minEval = 10000;
             for (int move = 1; move <= 25; ++move) {
                 if (game->is_valid_move(move)) {
                     char opponentSymbol = getsymbol() == 'X' ? 'O' : 'X';
-                    game->update_board(move, opponentSymbol);
-                    int eval = minimax(depth - 1, true, alpha, beta);
-                    undoMove(move);
-                    minEval = min(minEval, eval);
-                    beta = min(beta, eval);
-                    if (beta <= alpha) break;
+                    game->update_board(move, opponentSymbol); // Make a move.
+                    int eval = minimax(depth - 1, true, alpha, beta); // Recursively evaluate.
+                    undoMove(move); // Undo the move.
+                    minEval = min(minEval, eval); // Update the min evaluation.
+                    beta = min(beta, eval); // Update beta.
+                    if (beta <= alpha) break; // Prune the search tree.
                 }
             }
             return minEval;
         }
     }
 
+    // Determines the best move using the minimax algorithm.
     int getBestMove() {
         int bestMove = -1;
         int bestValue = -10000;
         for (int move = 1; move <= 25; ++move) {
             if (game->is_valid_move(move)) {
-                game->update_board(move, getsymbol());
-                int moveValue = minimax(5, false, -10000, 10000);
-                undoMove(move);
-                if (moveValue > bestValue) {
+                game->update_board(move, getsymbol()); // Make a move.
+                int moveValue = minimax(5, false, -10000, 10000); // Evaluate the move.
+                undoMove(move); // Undo the move.
+                if (moveValue > bestValue) { // Update the best move if necessary.
                     bestValue = moveValue;
                     bestMove = move;
                 }
@@ -204,35 +218,33 @@ public:
         return bestMove;
     }
 
+    // Undoes a move by resetting the corresponding cell on the board.
     void undoMove(int move) {
-        int row = (move - 1) / 5;
-        int col = (move - 1) % 5;
-        game->board[row][col] = ' ';
+        int row = (move - 1) / 5; // Calculate row index.
+        int col = (move - 1) % 5; // Calculate column index.
+        game->board[row][col] = ' '; // Reset the cell to empty.
     }
 };
 
 
 int easyAIMove(TicTacToe5x5& game) {
-    srand(time(0)); // Seed the random number generator with the current time
+    srand(time(0)); // Seed RNG.
     int move;
     do {
-        move = rand() % 25 + 1; // Random move between 1 and 25
-    } while (!game.is_valid_move(move));
-    return move;
+        move = rand() % 25 + 1; // Random move (1-25).
+    } while (!game.is_valid_move(move)); // Ensure move is valid.
+    return move; // Return valid move.
 }
 
 bool isGameOver(TicTacToe5x5& game) {
     int count = 0;
     for (int i = 0; i < 5; i++) {
         for (int j = 0; j < 5; j++) {
-            if (game.board[i][j] == 'X' || game.board[i][j] == 'O') {
-                count++;
-            }
+            if (game.board[i][j] == 'X' || game.board[i][j] == 'O') count++; // Count moves.
         }
     }
-    if (count < 24) return false;
-
-    return true;
+    if (count < 24) return false; // Game not over if less than 24 moves.
+    return true; // Board nearly full.
 }
 
 void playerVsPlayer(TicTacToe5x5& game, Player<char>& player1, Player<char>& player2) {
@@ -384,10 +396,13 @@ void playFive() {
     game.initializeBoard();
     string player1_name, player2_name;
     string mode;
+    // Display menu and get user's choice
     cout << "Choose mode:\n1. Player vs Player\n2. Player vs Random Computer Player\n3. Player vs Smart AI Player\n=> ";
     cin >> mode;
 
+    // Start the selected game mode
     if (mode == "1") {
+        // entering the names of the two players
         cout << "Enter the name of player X: ";
         cin >> player1_name;
         cout << "Enter the name of player O: ";
@@ -396,12 +411,14 @@ void playFive() {
         Player<char> player2(player2_name,'O');
         playerVsPlayer(game, player1, player2);
     } else if (mode == "2") {
+        // enter the name of the human player
         cout << "Enter the name of player X: ";
         cin >> player1_name;
         Player<char> player1(player1_name,'X');
         Player<char> player2("Random Computer player",'O');
         playerVsComputer(game, player1, player2);
     } else if (mode == "3") {
+        // enter the name of the human player
         cout << "Enter the name of player X: ";
         cin >> player1_name;
         Player<char> player1(player1_name,'X');
