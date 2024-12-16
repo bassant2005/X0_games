@@ -289,11 +289,28 @@ void play_vs_player() {
         // Player 1's turn
         int move, number;
         do {
-            cout << "Player " << player1.getname() << " (odd numbers) enter move (1-9): ";
-            cin >> move;  // Get player 1's move
-
-            cout << "Now enter your odd number: ";
-            cin >> number;  // Get player 1's number
+            while(true) {
+                cout << "Player " << player1.getname() << " (odd numbers) enter move (1-9): ";
+                cin >> move;  // Get player 1's move
+                if (cin.fail() || move < 1 || move > 9) {
+                    cout << "Invalid move. Please enter a number between 1 and 9.\n";
+                    cin.clear();                 // Clear error flag
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n');  // Discard invalid input
+                } else {
+                    break;  // Valid input
+                }
+            }
+            while(true) {
+                cout << "Now enter your odd number: ";
+                cin >> number;  // Get player 1's number
+                if (cin.fail() || move < 1 || move > 9) {
+                    cout << "Invalid move. Please enter a number between 1 and 9.\n";
+                    cin.clear();                 // Clear error flag
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n');  // Discard invalid input
+                } else {
+                    break;  // Valid input
+                }
+            }
 
             // Check if the move and number are valid
             if (!board.is_valid_move(move)) {
@@ -386,10 +403,28 @@ void play_with_computer() {
             if(isPlayerTurn) {  // Player 1's turn
                 do {
                     // Get Player 1's move
-                    cout << "Player "<< player1.getname() <<" (odd numbers) enter move (1-9): ";
-                    cin >> move;
-                    cout << "Now enter your odd number: ";
-                    cin >> number;
+                    while(true) {
+                        cout << "Player " << player1.getname() << " (odd numbers) enter move (1-9): ";
+                        cin >> move;
+                        if (cin.fail() || move < 1 || move > 9) {
+                            cout << "Invalid move. Please enter a number between 1 and 9.\n";
+                            cin.clear();                 // Clear error flag
+                            cin.ignore(numeric_limits<streamsize>::max(), '\n');  // Discard invalid input
+                        } else {
+                            break;  // Valid input
+                        }
+                    }
+                    while(true) {
+                        cout << "Now enter your odd number: ";
+                        cin >> number;
+                        if (cin.fail() || move < 1 || move > 9) {
+                            cout << "Invalid move. Please enter a number between 1 and 9.\n";
+                            cin.clear();                 // Clear error flag
+                            cin.ignore(numeric_limits<streamsize>::max(), '\n');  // Discard invalid input
+                        } else {
+                            break;  // Valid input
+                        }
+                    }
 
                     // Validate move and number
                     if (!board.is_valid_move(move)) {
@@ -441,10 +476,28 @@ void play_with_computer() {
                 bool validMove = false;
                 do {
                     // Get Player 1's move
-                    cout << "Player "<< player1.getname() <<" (odd numbers) enter move (1-9): ";
-                    cin >> move;
-                    cout << "Now enter your odd number: ";
-                    cin >> number;
+                    while(true) {
+                        cout << "Player " << player1.getname() << " (odd numbers) enter move (1-9): ";
+                        cin >> move;
+                        if (cin.fail() || move < 1 || move > 9) {
+                            cout << "Invalid move. Please enter a number between 1 and 9.\n";
+                            cin.clear();                 // Clear error flag
+                            cin.ignore(numeric_limits<streamsize>::max(), '\n');  // Discard invalid input
+                        } else {
+                            break;  // Valid input
+                        }
+                    }
+                    while(true) {
+                        cout << "Now enter your odd number: ";
+                        cin >> number;
+                        if (cin.fail() || move < 1 || move > 9) {
+                            cout << "Invalid move. Please enter a number between 1 and 9.\n";
+                            cin.clear();                 // Clear error flag
+                            cin.ignore(numeric_limits<streamsize>::max(), '\n');  // Discard invalid input
+                        } else {
+                            break;  // Valid input
+                        }
+                    }
 
                     // Validate move and number
                     if (!board.is_valid_move(move)) {
