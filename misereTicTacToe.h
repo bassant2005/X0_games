@@ -11,41 +11,35 @@ using namespace std;
 
 class MisereTicTacToe : public Board<char> {
 private:
-    bool isHardAI;
-    char player1Symbol;
-    char player2Symbol;
-
+    bool isHardAI; // Flag for hard AI mode.
+    char player1Symbol; // Symbol for player 1.
+    char player2Symbol; // Symbol for player 2.
 
 public:
     MisereTicTacToe() : Board(3, 3), isHardAI(false), player1Symbol('X'), player2Symbol('O') {
-        initializeBoard();
+        initializeBoard(); // Initialize board with empty cells.
     }
 
     void initializeBoard() override {
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < columns; j++) {
-                board[i][j] = ' ';
+                board[i][j] = ' '; // Set all cells to empty.
             }
         }
-        currentPlayerSymbol = 'X';  // First player starts as 'X'
+        currentPlayerSymbol = 'X'; // Start with 'X'.
     }
 
     void display_board() override {
         cout << '\n';
-        int num = 1;
+        int num = 1; // Number each cell.
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < columns; j++) {
-                if (board[i][j] == ' ')
-                    cout << num;
-                else
-                    cout << board[i][j];
-                if (j < columns - 1)
-                    cout << " | ";
+                cout << (board[i][j] == ' ' ? to_string(num) : string(1, board[i][j]));
+                if (j < columns - 1) cout << " | ";
                 num++;
             }
             cout << endl;
-            if (i < rows - 1)
-                cout << "--|---|---" << endl;
+            if (i < rows - 1) cout << "--|---|---" << endl; // Row separator.
         }
         cout << endl;
     }
@@ -53,10 +47,11 @@ public:
     bool is_valid_move(int pos) override {
         int row = (pos - 1) / columns;
         int col = (pos - 1) % columns;
-        return (pos >= 1 && pos <= 9 && board[row][col] == ' ');
+        return (pos >= 1 && pos <= 9 && board[row][col] == ' '); // Check valid position.
     }
 
     bool is_win(char currentPlayerSymbol) override {
+        // Check rows, columns, and diagonals for a win.
         for (int i = 0; i < rows; ++i) {
             if (board[i][0] == board[i][1] && board[i][1] == board[i][2] && board[i][0] == currentPlayerSymbol)
                 return true;
@@ -72,261 +67,263 @@ public:
     }
 
     bool is_draw() override {
+        // Check if all cells are filled.
         for (int i = 0; i < rows; ++i) {
             for (int j = 0; j < columns; ++j) {
-                if (board[i][j] == ' ')
-                    return false;
+                if (board[i][j] == ' ') return false; // Empty cell found.
             }
         }
-        return true;
+        return true; // No empty cells.
     }
 
     bool update_board(int pos, char symbol) override {
         int row = (pos - 1) / columns;
         int col = (pos - 1) % columns;
         if (is_valid_move(pos)) {
-            board[row][col] = symbol;
+            board[row][col] = symbol; // Place the symbol.
             return true;
         }
-        return false;
+        return false; // Invalid move.
     }
 
     void setPlayerSymbols(char player1Symbol, char player2Symbol) {
         this->player1Symbol = player1Symbol;
         this->player2Symbol = player2Symbol;
-        currentPlayerSymbol = player1Symbol;
+        currentPlayerSymbol = player1Symbol; // Start with player 1.
     }
 
     char get_current_symbol() {
-        return currentPlayerSymbol;
+        return currentPlayerSymbol; // Return current symbol.
     }
 
     void switch_turn() {
-        if (currentPlayerSymbol == player1Symbol) {
-            currentPlayerSymbol = player2Symbol;
-        }
-        else {
-            currentPlayerSymbol = player1Symbol;
-        }
+        // Alternate between players.
+        currentPlayerSymbol = (currentPlayerSymbol == player1Symbol) ? player2Symbol : player1Symbol;
     }
 
     bool update_board_auto(int row, int col, char symbol) {
-        if (board[row][col] == ' ') { // Check if the position is empty
-            board[row][col] = symbol;
+        if (board[row][col] == ' ') { // Check if cell is empty.
+            board[row][col] = symbol; // Place symbol.
             return true;
         }
-        return false;
+        return false; // Invalid move.
     }
 
-
     void easyAI(int& row, int& col) {
-        srand(time(0));
+        srand(time(0)); // Randomize seed.
         do {
             row = rand() % rows;
             col = rand() % columns;
-        } while (board[row][col] != ' ');
+        } while (board[row][col] != ' '); // Find empty cell.
     }
 
     void hardAI(char aiSymbol, char playerSymbol, int &row, int &col) {
-    // Priority: 1) Make a move that forces the opponent to form 3 in a row (win condition for Misere rules)
-    //           2) Avoid creating a row of 3 for the AI itself.
-
-    // Search for a move that forces the user to make a row of 3
-    for (int i = 0; i < rows; ++i) {
-        for (int j = 0; j < columns; ++j) {
-            if (board[i][j] == ' ') {
-                // Temporarily mark AI's move
-                board[i][j] = aiSymbol;
-
-                // Check if this move forces the player to form a row of 3
-                bool userForced = false;
-                for (int x = 0; x < rows; ++x) {
-                    for (int y = 0; y < columns; ++y) {
-                        if (board[x][y] == ' ') {
-                            // Temporarily mark player's move
-                            board[x][y] = playerSymbol;
-                            if (is_win(playerSymbol)) {
-                                userForced = true; // If user would form 3 in a row here, this is a good move for AI
+        // Prioritize forcing the opponent to win.
+        for (int i = 0; i < rows; ++i) {
+            for (int j = 0; j < columns; ++j) {
+                if (board[i][j] == ' ') {
+                    board[i][j] = aiSymbol; // Simulate AI move.
+                    bool userForced = false;
+                    for (int x = 0; x < rows; ++x) {
+                        for (int y = 0; y < columns; ++y) {
+                            if (board[x][y] == ' ') {
+                                board[x][y] = playerSymbol; // Simulate player move.
+                                if (is_win(playerSymbol)) userForced = true;
+                                board[x][y] = ' '; // Undo player move.
                             }
-                            board[x][y] = ' '; // Undo player's move
                         }
                     }
+                    if (userForced) {
+                        row = i;
+                        col = j;
+                        board[i][j] = ' '; // Undo AI move.
+                        return;
+                    }
+                    board[i][j] = ' '; // Undo AI move.
                 }
-
-                // If this move forces the user to form 3 in a row, use it
-                if (userForced) {
-                    row = i;
-                    col = j;
-                    board[i][j] = ' '; // Undo AI's move for now
-                    return;
-                }
-
-                board[i][j] = ' '; // Undo AI's move
             }
         }
-    }
 
-    // If no forcing move is found, avoid creating 3 in a row
-    for (int i = 0; i < rows; ++i) {
-        for (int j = 0; j < columns; ++j) {
-            if (board[i][j] == ' ') {
-                board[i][j] = aiSymbol; // Temporarily mark AI's move
-
-                if (!is_win(aiSymbol)) { // If AI doesn't form a row of 3, this move is okay
-                    row = i;
-                    col = j;
-                    board[i][j] = ' '; // Undo AI's temporary move
-                    return;
+        // Avoid creating a win for AI.
+        for (int i = 0; i < rows; ++i) {
+            for (int j = 0; j < columns; ++j) {
+                if (board[i][j] == ' ') {
+                    board[i][j] = aiSymbol; // Simulate AI move.
+                    if (!is_win(aiSymbol)) { // Ensure no win.
+                        row = i;
+                        col = j;
+                        board[i][j] = ' '; // Undo AI move.
+                        return;
+                    }
+                    board[i][j] = ' '; // Undo AI move.
                 }
-
-                board[i][j] = ' '; // Undo AI's move
             }
         }
+
+        // Fallback to random move.
+        easyAI(row, col);
     }
-
-    // If no move avoids making a win for AI, fallback to random move as a last resort
-    easyAI(row, col);
-}
-
-
 };
 
 void playerVsPlayer(MisereTicTacToe &game) {
-//    char player1Symbol = 'X', player2Symbol = 'O';
-    string name1,name2;
+    // Prompt for player names and create Player objects
+    string name1, name2;
     cout << "player1 enter your name: ";
     cin >> name1;
-    Player player1(name1,'X');
+    Player player1(name1, 'X');
     cout << "player2 enter your name: ";
     cin >> name2;
-    Player player2(name2,'O');
+    Player player2(name2, 'O');
+
+    // Set the player symbols in the game
     game.setPlayerSymbols(player1.getsymbol(), player2.getsymbol());
 
-    while (!game.is_win(player1.getsymbol()) && !game.is_win(player2.getsymbol()) && !game.is_draw()) {
-        game.display_board();
-        int pos;
+    // Game loop: continues until a win or draw condition is met
+    while (!game.is_win(player1.getsymbol()) &&
+           !game.is_win(player2.getsymbol()) &&
+           !game.is_draw()) {
 
-        if( game.get_current_symbol() == player1.getsymbol()) {
+        // Display the current state of the board
+        game.display_board();
+
+        int pos; // Variable for the player's move
+
+        // Indicate whose turn it is
+        if (game.get_current_symbol() == player1.getsymbol()) {
             cout << "Player " << player1.getname() << "'s turn." << endl;
-        }
-        else{
+        } else {
             cout << "Player " << player2.getname() << "'s turn." << endl;
         }
 
-        cout <<" enter your move (1-9): ";
+        // Prompt the player to enter their move
+        cout << " enter your move (1-9): ";
         cin >> pos;
 
+        // Attempt to update the board with the player's move
         if (game.update_board(pos, game.get_current_symbol())) {
+            // Switch turns if the move is valid
             game.switch_turn();
         } else {
+            // Notify the player if the move is invalid
             cout << "Invalid move! Try again.\n";
         }
     }
 
+    // Display the final state of the board
     game.display_board();
+
+    // Check and display the game result
     if (game.is_win(player1.getsymbol())) {
-        cout << player1.getname() <<" Wins!\n";
-    }
-    else if (game.is_win(player2.getsymbol())) {
-        cout << player2.getname() <<" Wins!\n";
-    }
-    else {
+        cout << player2.getname() << " Wins!\n";
+    } else if (game.is_win(player2.getsymbol())) {
+        cout << player1.getname() << " Wins!\n";
+    } else {
         cout << "It's a Draw.\n";
     }
 }
 
 void playerVsComputer(MisereTicTacToe &game) {
-
+    // Get the player's name and set player and computer symbols
     string name;
     cout << "enter your name: ";
     cin >> name;
-    Player player(name,'X');
+    Player player(name, 'X');
     game.setPlayerSymbols(player.getsymbol(), 'O');
 
+    // Game loop: runs until a win or draw occurs
     while (!game.is_win(player.getsymbol()) && !game.is_win('O') && !game.is_draw()) {
-        int row, col;
-        game.display_board();
+        int row, col; // Variables for computer's move
+        game.display_board(); // Show the board
+
         if (game.get_current_symbol() == player.getsymbol()) {
+            // Player's turn
             int pos;
-            cout << player.getname() <<" enter your move (1-9): ";
+            cout << player.getname() << " enter your move (1-9): ";
             cin >> pos;
 
+            // Update the board if move is valid, else ask again
             if (game.update_board(pos, player.getsymbol())) {
-                game.switch_turn();
+                game.switch_turn(); // Switch turn if move is valid
             } else {
                 cout << "Invalid move! Try again.\n";
             }
         } else {
-            game.easyAI(row, col);
-            game.update_board_auto(row, col, 'O');
-            game.switch_turn();
-            cout << "Computer move to (" << row * 3 + col + 1 << ").\n";
+            // Computer's turn (easy AI)
+            game.easyAI(row, col); // Compute random valid move
+            game.update_board_auto(row, col, 'O'); // Place computer's move
+            game.switch_turn(); // Switch turn
+            cout << "Computer moves to (" << row * 3 + col + 1 << ").\n"; // Announce move
         }
     }
 
+    // Display the result of the game
     if (game.is_win(player.getsymbol())) {
         game.display_board();
         cout << "Computer wins!\n";
-    }
-    else if (game.is_win('O')) {
+    } else if (game.is_win('O')) {
         game.display_board();
         cout << player.getname() << " wins!\n";
-    }
-    else {
+    } else {
         game.display_board();
         cout << "It's a Draw.\n";
     }
 }
 
 void playerVsAI(MisereTicTacToe &game) {
-
+    // Initialize the player's name and set symbols for player and AI
     string name;
     cout << "enter your name: ";
     cin >> name;
-    Player player(name,'X');
+    Player player(name, 'X');
     game.setPlayerSymbols(player.getsymbol(), 'O');
 
+    // Game loop: continues until there's a win or draw
     while (!game.is_win(player.getsymbol()) && !game.is_win('O') && !game.is_draw()) {
-        game.display_board();
+        game.display_board(); // Display the current board state
+
         if (game.get_current_symbol() == player.getsymbol()) {
+            // Player's turn
             int pos;
-            cout << player.getname() <<" enter your move (1-9): ";
+            cout << player.getname() << " enter your move (1-9): ";
             cin >> pos;
 
+            // Validate and update the board if the move is valid
             if (game.update_board(pos, player.getsymbol())) {
-                game.switch_turn();
+                game.switch_turn(); // Switch turn after a valid move
             } else {
                 cout << "Invalid move! Try again.\n";
             }
         } else {
+            // AI's turn (hard difficulty using Minimax or similar logic)
             int row, col;
-            game.hardAI('O', player.getsymbol(), row, col);
-            game.update_board_auto(row, col, 'O');
-            game.switch_turn();
-            cout << "AI move to (" << row * 3 + col + 1 << ").\n";
+            game.hardAI('O', player.getsymbol(), row, col); // Compute the best move
+            game.update_board_auto(row, col, 'O'); // Apply AI's move
+            game.switch_turn(); // Switch turn
+            cout << "AI moves to (" << row * 3 + col + 1 << ").\n"; // Announce AI's move
         }
     }
 
+    // Display the result of the game
     if (game.is_win(player.getsymbol())) {
         game.display_board();
         cout << "AI wins!\n";
-    }
-    else if (game.is_win('O')) {
+    } else if (game.is_win('O')) {
         game.display_board();
         cout << player.getname() << " wins!\n";
-    }
-    else {
+    } else {
         cout << "It's a Draw.\n";
     }
 }
 
 void playMisere() {
     MisereTicTacToe game;
+    // Display menu and get user's choice
     cout << "Welcome to Misere Tic Tac Toe!" << endl;
     cout << "Choose a mode:\n1. Player vs Player\n2. Player vs Easy Computer\n3. Player vs Hard AI\n=> ";
     string mode;
     cin >> mode;
 
+    // Start the selected game mode
     if (mode == "1") {
         playerVsPlayer(game);
     }
