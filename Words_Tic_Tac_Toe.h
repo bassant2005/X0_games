@@ -1,5 +1,6 @@
 #ifndef UNTITLED_WORDS_TIC_TAC_TOE_H
 #define UNTITLED_WORDS_TIC_TAC_TOE_H
+
 #include "BoardGame_Classes.h"
 #include <iostream>
 #include <fstream>
@@ -294,14 +295,30 @@ void player_vs_player() {
         // Player X's turn
         while (true) {  // Loop to ensure valid input
             cout << "Player " << player1.getname() << ", it's your turn!\n";
-            cout << "Enter the letter you want to place (A-Z): ";
-            cin >> letter;
-            cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-            cout << "Enter the position (1-9) for your move: ";
-            cin >> move;
-            cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            while(true) {
+                cout << "Enter the letter you want to place (A-Z): ";
+                cin >> letter;
+                if (isalpha(letter)) {
+                    letter = toupper(letter); // Ensure the letter is uppercase
+                    break;  // Valid input
+                } else {
+                    cout << "Invalid letter. Please enter a valid letter (A-Z).\n";
+                    cin.clear();                 // Clear error flag
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n');  // Discard invalid input
+                }
+            }
 
-            letter = toupper(letter); // Ensure letter is uppercase
+            while(true) {
+                cout << "Enter the position (1-9) for your move: ";
+                cin >> move;
+                if (cin.fail() || move < 1 || move > 9) {
+                    cout << "Invalid move. Please enter a number between 1 and 9.\n";
+                    cin.clear();                 // Clear error flag
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n');  // Discard invalid input
+                } else {
+                    break;  // Valid input
+                }
+            }
 
             // Check if the move is valid
             if (board.is_valid_move(move) && board.is_valid_letter(letter)) {
@@ -328,13 +345,29 @@ void player_vs_player() {
         // Player O's turn (similar to Player X's turn)
         while (true) {  // Loop to ensure valid input
             cout << "Player " << player2.getname() << ", it's your turn!\n";
-            cout << "Enter the letter you want to place (A-Z): ";
-            cin >> letter;
-            cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-            letter = toupper(letter); // Ensure letter is uppercase
-            cout << "Enter the position (1-9) for your move: ";
-            cin >> move;
-            cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            while (true) {
+                cout << "Enter the letter you want to place (A-Z): ";
+                cin >> letter;
+                if (isalpha(letter)) {
+                    letter = toupper(letter); // Ensure the letter is uppercase
+                    break;  // Valid input
+                } else {
+                    cout << "Invalid letter. Please enter a valid letter (A-Z).\n";
+                    cin.clear();                 // Clear error flag
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n');  // Discard invalid input
+                }
+            }
+            while (true) {
+                cout << "Enter the position (1-9) for your move: ";
+                cin >> move;
+                if (cin.fail() || move < 1 || move > 9) {
+                    cout << "Invalid move. Please enter a number between 1 and 9.\n";
+                    cin.clear();                 // Clear error flag
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n');  // Discard invalid input
+                } else {
+                    break;  // Valid input
+                }
+            }
 
             // Check if the move is valid
             if (board.is_valid_move(move) && board.is_valid_letter(letter)) {
@@ -388,14 +421,33 @@ void player_vs_computer() {
 
             if (is_player_turn) {
                 // Player's turn
-                cout << "Player " << player1.getname() << ", it's your turn!\n";
-                cout << "Enter the letter you want to place (A-Z): ";
-                cin >> letter;
-                letter = toupper(letter); // Ensure the letter is uppercase
+                while (true) {
+                    cout << player1.getname() << " enter the letter you want to place (A-Z): ";
+                    cin >> letter;
 
-                cout << "Enter the position (1-9) for your move: ";
-                cin >> move;
+                    if (isalpha(letter)) {
+                        letter = toupper(letter); // Ensure the letter is uppercase
+                        break;  // Valid input
+                    } else {
+                        cout << "Invalid letter. Please enter a valid letter (A-Z).\n";
+                        cin.clear();                 // Clear error flag
+                        cin.ignore(numeric_limits<streamsize>::max(), '\n');  // Discard invalid input
+                    }
+                }
 
+                // Validate the position
+                while (true) {
+                    cout << player1.getname() << " enter the position (1-9) for your move: ";
+                    cin >> move;
+
+                    if (cin.fail() || move < 1 || move > 9) {
+                        cout << "Invalid move. Please enter a number between 1 and 9.\n";
+                        cin.clear();                 // Clear error flag
+                        cin.ignore(numeric_limits<streamsize>::max(), '\n');  // Discard invalid input
+                    } else {
+                        break;  // Valid input
+                    }
+                }
                 // Validate and update the board
                 if (board.is_valid_move(move) && board.is_valid_letter(letter)) {
                     board.update_board(move, letter);
@@ -442,12 +494,29 @@ void player_vs_computer() {
             if (is_player_turn) {
                 // Player's turn
                 cout << "Player " << player1.getname() << ", it's your turn!\n";
-                cout << "Enter the letter you want to place (A-Z): ";
-                cin >> letter;
-                letter = toupper(letter); // Ensure the letter is uppercase
-
-                cout << "Enter the position (1-9) for your move: ";
-                cin >> move;
+                while(true) {
+                    cout << "Enter the letter you want to place (A-Z): ";
+                    cin >> letter;
+                    if (isalpha(letter)) {
+                        letter = toupper(letter); // Ensure the letter is uppercase
+                        break;  // Valid input
+                    } else {
+                        cout << "Invalid letter. Please enter a valid letter (A-Z).\n";
+                        cin.clear();                 // Clear error flag
+                        cin.ignore(numeric_limits<streamsize>::max(), '\n');  // Discard invalid input
+                    }
+                }
+                while(true) {
+                    cout << "Enter the position (1-9) for your move: ";
+                    cin >> move;
+                    if (cin.fail() || move < 1 || move > 9) {
+                        cout << "Invalid move. Please enter a number between 1 and 9.\n";
+                        cin.clear();                 // Clear error flag
+                        cin.ignore(numeric_limits<streamsize>::max(), '\n');  // Discard invalid input
+                    } else {
+                        break;  // Valid input
+                    }
+                }
 
                 // Validate and update the board
                 if (board.is_valid_move(move) && board.is_valid_letter(letter)) {
