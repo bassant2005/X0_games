@@ -26,7 +26,7 @@ A multi-level Tic-Tac-Toe game, where each cell is a smaller Tic-Tac-Toe game.
 SUS Tic-Tac-Toe
 A variant involving social deception, where players must figure out who is the "SUS" player.
 
-##Game Implementations
+## Game Implementations
 Each game has its own header file, defining the class structure, rules, and gameplay mechanics.
 The main.cpp file serves as an entry point for the games and includes the logic to initialize and run each game.
 Setup
@@ -35,7 +35,7 @@ C++ compiler (e.g., GCC, Clang, or MSVC)
 C++11 or higher recommended
 Instructions
 
-##Game List
+## Game List
 Pyramid Tic-Tac-Toe: Pyramid_X_O.h
 Connect 4: Connect4.h
 Numerical Tic-Tac-Toe: Numerical_Tic_Tac_Toe.h
@@ -45,13 +45,13 @@ Words Tic-Tac-Toe: Words_Tic_Tac_Toe.h
 Misere Tic-Tac-Toe: misereTicTacToe.h
 SUS Tic-Tac-Toe: SUS_X_O.h
 
-##Fork the repository.
+## Fork the repository.
 Create a new branch (git checkout -b feature-branch).
 Commit your changes (git commit -m 'Add feature').
 Push to the branch (git push origin feature-branch).
 Create a pull request.
 
-##Contributors
+## Contributors
 rawdaraafat
 bassant2005
 Mariam Ehab
