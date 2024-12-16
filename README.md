@@ -37,12 +37,19 @@ Instructions
 
 ## Game List
 Pyramid Tic-Tac-Toe: Pyramid_X_O.h
+
 Connect 4: Connect4.h
+
 Numerical Tic-Tac-Toe: Numerical_Tic_Tac_Toe.h
+
 5x5 Tic-Tac-Toe: T5_5TicTacToe.h
+
 Ultimate Tic-Tac-Toe: UltimateTicTacToe.h
+
 Words Tic-Tac-Toe: Words_Tic_Tac_Toe.h
+
 Misere Tic-Tac-Toe: misereTicTacToe.h
+
 SUS Tic-Tac-Toe: SUS_X_O.h
 
 ## Fork the repository.
